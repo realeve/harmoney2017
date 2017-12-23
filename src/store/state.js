@@ -38,11 +38,11 @@ const state = {
         dpt: ["技术质量部"],
         isLogin: false,
         curScore: 0, // 上次答题得分
-        maxTimes: 20000,
+        maxTimes: 1,
         curTimes: 0,
         // 最小抽奖得分
         minPrizeScore: 80,
-        testMode: true
+        testMode: false
     },
     paperInit: false,
     peopleCount: 0,

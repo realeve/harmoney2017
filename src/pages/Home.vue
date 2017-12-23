@@ -1,10 +1,8 @@
 <template>
   <div class="wrapper">
     <div class="content">
-      <p class="title">成都印钞有限公司<br>2017年度和谐企业创建</p>
-      <div class="margin-top-20">
-        二级单位员工满意度测评问卷
-      </div>
+      <p class="slogan">成都印钞有限公司</p>
+      <p class="title margin-top-20">2017年度和谐企业创建<br>二级单位员工满意度测评问卷</p>
       <div class="welcome margin-top-20">
         <p>成都印钞有限公司和谐企业创建离不开广大职工的积极参与和支持。公司和谐企业创建工作开展满意度测评的主旨，是通过抽样问卷的形式了解职工对公司和部门和谐企业创建工作进程中的想法和建议，以便于发现创建过程中存在的问题、分析原因并探索改进方向。</p>
         <p>本次测评采用不记名问卷方式，企业文化部将对您提交的问卷严格保密。</p>
@@ -65,21 +63,22 @@ export default {
         return;
       }
       userInfo = JSON.parse(userInfo);
+
       this.sport = {
-        userName: userInfo.user_name,
-        cardNo: userInfo.user_id,
-        dpt: [userInfo.user_dpt]
+        userName: userInfo.username,
+        cardNo: userInfo.psw,
+        dpt: [userInfo.dept]
       };
       this.login();
     },
     login() {
       let params = {
-        user_name: this.sport.userName,
-        user_id: this.sport.cardNo,
-        user_dpt: this.sport.dpt[0],
-        sportid: this.sport.id,
-        s: "/addon/GoodVoice/GoodVoice/examSafeLogin"
+        username: this.sport.userName,
+        psw: this.sport.cardNo,
+        dept: this.sport.dpt[0],
+        s: "/addon/Api/Api/login"
       };
+
       if (
         this.sport.userName == "" ||
         this.sport.cardNo == "" ||
@@ -92,32 +91,23 @@ export default {
           params
         })
         .then(res => {
-          let obj = res.data;
+          let obj = res.data[0];
           // 卡号或部门输入错误
-          if (obj.id == 0) {
-            return;
-          }
-          //校验姓氏
-          if (obj.first_name.trim() != params.user_name.substr(0, 1)) {
+
+          if (typeof obj == "undefined") {
             return;
           }
 
           this.sport.uid = obj.id;
-          this.sport.curScore = obj.score;
-          if (
-            !this.sport.isOnline &&
-            parseInt(obj.answer_times) > this.sport.maxTimes
-          ) {
-            this.toast.show = true;
-            this.toast.msg = "答题次数用完";
-            this.haveAnswerTimes = false;
-            this.jump("info");
-          } else {
-            // 登录成功
-            this.sport.isLogin = true;
-            this.sport.curTimes = parseInt(obj.answer_times) + 1;
-            this.showLoginfo = true;
-          }
+          this.toast.show = true;
+          this.toast.msg = "答题次数用完";
+          this.haveAnswerTimes = false;
+          this.jump("info");
+
+          // 登录成功
+          // this.sport.isLogin = true;
+          // this.sport.curTimes = parseInt(obj.answer_times) + 1;
+          // this.showLoginfo = true;
         });
     }
   },
@@ -128,15 +118,7 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-.wrapper {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
 .content {
-  flex: 1;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -144,14 +126,17 @@ export default {
   width: 100%;
   justify-content: center;
   .title {
-    font-size: 17pt;
+    font-size: 16pt;
     text-align: center;
   }
   .welcome {
     width: 80%;
     p {
+      padding-top: 10px;
       padding-bottom: 10px;
-      text-indent: 2em;
+      text-indent: 2.2em;
+      line-height: 2em;
+      letter-spacing: 0.1em;
     }
     .text-right {
       text-align: right;

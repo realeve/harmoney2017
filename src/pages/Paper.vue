@@ -123,6 +123,7 @@ export default {
     getSubmitData() {
       let arr = ["A", "B", "C", "D", "E"];
       let answer = this.answerList.map(item => arr[item]).join(",");
+      this.sport.curScore = this.subScore;
       return {
         start_time: this.startTime,
         rec_time: dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss"),

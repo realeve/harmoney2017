@@ -1,5 +1,5 @@
 <template>
-  <footer>
+  <footer class="margin-top-20">
     {{year}} &copy; 成都印钞有限公司
   </footer>
 </template>

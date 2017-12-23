@@ -93,12 +93,24 @@ export default {
     jump(router) {
       this.$router.push(router);
     },
+    loadUserInfo() {
+      let userInfo = localStorage.getItem("userInfoHarmoney");
+      if (userInfo == null) {
+        return;
+      }
+      userInfo = JSON.parse(userInfo);
+
+      this.sport = {
+        userName: userInfo.username,
+        cardNo: userInfo.psw,
+        dpt: [userInfo.dept]
+      };
+    },
     submit: async function() {
       let params = {
         username: this.sport.userName,
         psw: this.sport.cardNo,
         dept: this.sport.dpt[0],
-        sportid: this.sport.id,
         s: "/addon/Api/Api/login"
       };
       let uid = await this.$http
@@ -106,13 +118,16 @@ export default {
           params
         })
         .then(res => {
-          let obj = res.data;
-          return obj;
+          let obj = res.data[0];
+          if (typeof obj == "undefined") {
+            obj = { id: 0 };
+          }
+          return obj.id;
         });
-      console.log(uid);
+      // console.log(uid);
 
       // 卡号或部门输入错误
-      if (obj.id == 0) {
+      if (uid == 0) {
         this.toast.show = true;
         this.toast.msg = "登录失败";
         return;
@@ -120,7 +135,7 @@ export default {
 
       params = {
         uid,
-        sportid: this.sport.id,
+        sid: this.sport.id,
         s: "/addon/Api/Api/getHarmoneyPaper"
       };
       let times = await this.$http
@@ -129,11 +144,10 @@ export default {
         })
         .then(res => {
           let obj = res.data;
-          return obj;
+          return obj[0].num;
         });
-      console.log(times);
 
-      if (times) {
+      if (times >= this.sport.maxTimes) {
         this.toast.show = true;
         this.toast.msg = "答题次数用完";
         this.jump("info");
@@ -142,7 +156,7 @@ export default {
 
       // 登录成功
       this.sport.isLogin = true;
-      this.sport.curTimes = parseInt(obj.answer_times) + 1;
+      this.sport.curTimes = parseInt(times) + 1;
 
       params = {
         username: this.sport.userName,
@@ -153,13 +167,14 @@ export default {
 
       var userInfo = JSON.stringify(params);
       this.sport.uid = uid;
-      this.sport.curScore = obj.score;
+      // this.sport.curScore = obj.score;
       localStorage.setItem("userInfoHarmoney", userInfo);
       this.jump("paper");
     }
   },
   mounted() {
     document.title = "登录";
+    this.loadUserInfo();
   }
 };
 </script>
