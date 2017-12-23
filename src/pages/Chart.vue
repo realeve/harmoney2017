@@ -151,12 +151,10 @@ export default {
 <style lang="less" scoped>
 .content {
   margin: 0 auto;
-
-  margin: 20px 0;
   padding: 10px;
   color: #444;
   background: #fff;
-  width: 90%;
+  width: 100%;
   .title {
     font-size: 16pt;
     text-align: center;
