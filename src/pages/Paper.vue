@@ -16,6 +16,7 @@
         </div>
       </div>
     </div>
+    <div class="iSlider-arrow"></div>
     <toast v-model="toast.show">{{ toast.msg }}</toast>
     <!-- <tips></tips> -->
   </div>
@@ -271,5 +272,88 @@ export default {
   box-sizing: border-box;
   overflow-y: auto;
   min-height: 60vh;
+}
+
+/* Arrow */
+@arrow-color: rgb(90, 88, 84);
+.iSlider-arrow,
+.iSlider-arrow-prev {
+  position: absolute;
+  width: 3em;
+  height: 3em;
+  left: 0;
+  right: 0;
+  bottom: 5%;
+  margin: 0 auto;
+  border-top: 2px solid @arrow-color;
+  border-right: 2px solid @arrow-color;
+  z-index: 10000;
+  opacity: 0.8;
+  -webkit-animation: nextPage 1.2s linear infinite;
+}
+
+.iSlider-arrow-right {
+  position: absolute;
+  width: 2em;
+  height: 2em;
+  left: 82%;
+  right: 0;
+  bottom: 25%;
+  margin: auto 0;
+  border-top: 2px solid @arrow-color;
+  border-right: 2px solid @arrow-color;
+  z-index: 10000;
+  opacity: 0.8;
+  -webkit-animation: rightPage 1.2s linear infinite;
+}
+
+.iSlider-arrow-prev {
+  bottom: 1%;
+  -webkit-animation: prevPage 1.2s linear infinite;
+}
+
+@-webkit-keyframes rightPage {
+  0% {
+    -webkit-transform: translateX(10px) rotate(45deg);
+    opacity: 0.8;
+  }
+  50% {
+    -webkit-transform: translateX(20px) rotate(45deg);
+    opacity: 0.4;
+  }
+  100% {
+    -webkit-transform: translateX(40px) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes nextPage {
+  0% {
+    -webkit-transform: translateY(40px) rotate(-45deg);
+    opacity: 0.8;
+  }
+  50% {
+    -webkit-transform: translateY(20px) rotate(-45deg);
+    opacity: 0.4;
+  }
+  100% {
+    -webkit-transform: translateY(10px) rotate(-45deg);
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes prevPage {
+  0% {
+    -webkit-transform: translateY(-40px) rotate(135deg);
+    opacity: 0.8;
+  }
+  50% {
+    -webkit-transform: translateY(-20px) rotate(135deg);
+    opacity: 0.4;
+  }
+  100% {
+    -webkit-transform: translateY(-10px) rotate(135deg);
+    opacity: 0;
+  }
 }
 </style>
