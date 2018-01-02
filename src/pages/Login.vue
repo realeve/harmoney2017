@@ -2,7 +2,7 @@
   <div class="wrapper">
     <group class="content">
       <x-input title="姓名" required name="userName" v-model="sport.userName" placeholder="点击此处输入姓名"></x-input>
-      <x-input title="密码" required type="number" :max="7" name="cardNo" v-model="sport.cardNo" placeholder="点击此处输入身份证后6位" keyboard="number"></x-input>
+      <x-input title="密码" required :max="6" name="cardNo" v-model="sport.cardNo" placeholder="点击此处输入身份证后6位"></x-input>
       <template v-if="sport.useDept">
         <x-input title="部门" required disabled name="dpt" v-model="sport.dpt[0]"></x-input>
         <picker :data='dptList' v-model='sport.dpt'></picker>
@@ -48,8 +48,8 @@ export default {
           "物资管理部",
           "技术中心",
           "基建与行政事务部",
-          "人力资源部",
-          "企业文化部",
+          "党委组织部",
+          "党委宣传部",
           "纪检监察内审部",
           "群工部",
           "离退休工作部",

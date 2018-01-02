@@ -6,7 +6,7 @@
       <div class="card" v-for="(item,i) of chartData" :key="i">
         <div class="content">
           <div>{{i+1}}.{{item.title}}</div>
-          <v-chart :data="item.data"></v-chart>
+          <v-chart :data="item.data" :height="(i==0?600:250)+'px'"></v-chart>
         </div>
       </div>
     </div>
@@ -26,6 +26,7 @@ export default {
   data() {
     return {
       papers: [],
+      depts: [],
       now: dateFormat(new Date(), "YYYY-MM-DD HH:mm")
     };
   },
@@ -41,6 +42,10 @@ export default {
     },
     chartData() {
       let data = [
+        {
+          title: "各部门参与比例如下:",
+          data: this.depts
+        },
         {
           title: "性别构成：",
           data: [
@@ -97,23 +102,23 @@ export default {
       this.papers.map((item, i) => {
         // 性别
         if (item.sex == "男") {
-          data[0].data[0].value++;
+          data[1].data[0].value++;
         } else {
-          data[0].data[1].value++;
+          data[1].data[1].value++;
         }
 
         // 年龄
         const age = parseInt(item.age);
         if (age < 30) {
-          data[1].data[0].value++;
+          data[2].data[0].value++;
         } else if (age < 35) {
-          data[1].data[1].value++;
+          data[2].data[1].value++;
         } else if (age < 40) {
-          data[1].data[2].value++;
+          data[2].data[2].value++;
         } else if (age < 50) {
-          data[1].data[3].value++;
+          data[2].data[3].value++;
         } else {
-          data[1].data[4].value++;
+          data[2].data[4].value++;
         }
 
         // 其它数据
@@ -121,7 +126,7 @@ export default {
         answers.forEach((answer, idx) => {
           let code = answer.charCodeAt() - 65;
           // 选项记数
-          data[idx + 2].data[code].value++;
+          data[idx + 3].data[code].value++;
         });
       });
 
@@ -136,6 +141,16 @@ export default {
       };
 
       this.papers = await this.$http
+        .jsonp(this.cdnUrl, {
+          params
+        })
+        .then(res => res.data);
+      params = {
+        s: "/addon/Api/Api/deptHarmoney"
+      };
+
+      // 各部门参与情况
+      this.depts = await this.$http
         .jsonp(this.cdnUrl, {
           params
         })
