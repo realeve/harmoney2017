@@ -1,24 +1,52 @@
 <template>
   <div class="wrapper">
     <group class="content">
-      <x-input title="姓名" required name="userName" v-model="sport.userName" placeholder="点击此处输入姓名"></x-input>
-      <x-input title="密码" required :max="6" name="cardNo" v-model="sport.cardNo" placeholder="点击此处输入身份证后6位"></x-input>
+      <x-input
+        title="姓名"
+        required
+        name="userName"
+        v-model="sport.userName"
+        placeholder="点击此处输入姓名"
+      ></x-input>
+      <x-input
+        title="密码"
+        required
+        :max="6"
+        name="cardNo"
+        v-model="sport.cardNo"
+        placeholder="点击此处输入身份证后6位"
+      ></x-input>
       <template v-if="sport.useDept">
-        <x-input title="部门" required disabled name="dpt" v-model="sport.dpt[0]"></x-input>
-        <picker :data='dptList' v-model='sport.dpt'></picker>
+        <x-input
+          title="部门"
+          required
+          disabled
+          name="dpt"
+          v-model="sport.dpt[0]"
+        ></x-input>
+        <picker
+          :data='dptList'
+          v-model='sport.dpt'
+        ></picker>
       </template>
       <div class="btn">
-        <x-button :disabled="!shouldCommit" type="primary" @click.native="submit">登录</x-button>
+        <x-button
+          :disabled="!shouldCommit"
+          type="primary"
+          @click.native="submit"
+        >登录</x-button>
       </div>
     </group>
     <toast v-model="toast.show">{{ toast.msg }}</toast>
-    <v-foot/>
+    <v-foot />
   </div>
 </template>
 <script>
 import { XButton, XInput, Group, Toast, Picker, GroupTitle } from "vux";
 
 import { mapState } from "vuex";
+import * as db from "../lib/db";
+const R = require("ramda");
 
 export default {
   components: {
@@ -35,41 +63,7 @@ export default {
         show: false,
         msg: ""
       },
-      dptList: [
-        // ["西钞凹印党支部"]
-        [
-          "办公室",
-          "企划信息部",
-          "计划财务部",
-          "生产管理部",
-          "技术质量部",
-          "安全保卫部",
-          "设备管理部",
-          "物资管理部",
-          "技术中心",
-          "基建与行政事务部",
-          "党委组织部",
-          "党委宣传部",
-          "纪检监察内审部",
-          "群工部",
-          "离退休工作部",
-          "印钞数管部",
-          "胶凹制作部",
-          "印码制作部",
-          "检封制作部",
-          "钞纸制作部",
-          "钞纸成品制作部",
-          "能源环保部",
-          "市场开发部",
-          "采购管理部",
-          "长城公司",
-          "金鼎公司",
-          "物业公司",
-          "中钞金服",
-          "成钞医院"
-        ]
-        //['办公室', '电商部', '粉体材料生产部', '计划财务部', '加工生产部', '精炼生产部', '科技质量部', '企划安保部', '生产管理部', '物资设备保障部', '营销部', '造币制作部', '成钞财务部']
-      ]
+      dptList: []
     };
   },
   computed: {
@@ -94,8 +88,14 @@ export default {
     jump(router) {
       this.$router.push(router);
     },
+    async init() {
+      let { data: depts } = await db.getCbpcHarmoneyUserlistDepts();
+      this.dptList = R.flatten(depts);
+
+      this.loadUserInfo();
+    },
     loadUserInfo() {
-      let userInfo = localStorage.getItem("userInfoHarmoney");
+      let userInfo = localStorage.getItem("userInfoHarmoney_2018");
       if (userInfo == null) {
         return;
       }
@@ -175,7 +175,7 @@ export default {
   },
   mounted() {
     document.title = "登录";
-    this.loadUserInfo();
+    this.init();
   }
 };
 </script>
