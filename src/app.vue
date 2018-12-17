@@ -2,7 +2,7 @@
   <div id="app">
     <!-- <v-header/> -->
     <loading v-model="isLoading" />
-    <router-view/>
+    <router-view />
     <!-- <v-foot/>  -->
   </div>
 </template>
@@ -50,8 +50,9 @@ export default {
     },
     // 跳转URL
     redirectUrl() {
-      return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${this
-        .apiId}&redirect_uri=${encodeURIComponent(
+      return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${
+        this.apiId
+      }&redirect_uri=${encodeURIComponent(
         this.url
       )}&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect`;
     },
@@ -69,7 +70,7 @@ export default {
       if (!val) {
         return;
       }
-      this.title = `成都印钞有限公司2017年度和谐企业创建正在进行中...`;
+      this.title = `成都印钞有限公司2018年度和谐企业创建正在进行中...`;
       this.initWxShare();
     }
   },
