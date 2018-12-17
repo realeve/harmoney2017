@@ -1,31 +1,48 @@
 <template>
-  <div>
-    <div ref='fp'>
-      <div class="section content" v-for="(question,i) of questionList" :key="i">
-        <span v-if="sport.testMode">得分:{{subScore}}</span>
-        <div style="position:relative;">
-          <div class="qa-num">{{i+1}}/{{questionList.length}}</div>
-          <div class="qa-body">
-            <group :title="`${question.title}`">
-              <radio :options="question.option" v-model="answerList[i]"></radio>
-            </group>
+  <div class="container">
+    <div
+      class="section"
+      v-for="(question,i) of questionList"
+      :key="i"
+    >
+      <span v-if="sport.testMode">得分:{{subScore}}</span>
+      <div class="section-item">
+        <group
+          v-if="i<3"
+          :title="`${i+1}.${question.title}`"
+        >
+          <radio
+            :options="question.option"
+            v-model="answerList[i]"
+          ></radio>
+        </group>
+        <div v-else>
+          <div class="weui-cells__title">{{i+1}}.{{question.title}}</div>
+          <div class="rater-container">
+            <rater
+              :min="1"
+              :max="5"
+              v-model="answerList[i]"
+            />
+            <label class="bold">{{raterText[answerList[i]-1]}}</label>
           </div>
-        </div>
-        <div class="submit" v-if="i == questionList.length-1">
-          <x-button :disabled="!isCompleted" type="primary" @click.native="submit()">提交</x-button>
         </div>
       </div>
     </div>
-    <div class="iSlider-arrow"></div>
+    <x-button
+      :disabled="!isCompleted"
+      type="primary"
+      @click.native="submit()"
+      class="submit"
+    >提交</x-button>
     <toast v-model="toast.show">{{ toast.msg }}</toast>
-    <!-- <tips></tips> -->
   </div>
 </template>
 <script>
-import "fullpage.js";
-import $ from "fullpage.js/node_modules/jquery";
+// import "fullpage.js";
+// import $ from "fullpage.js/node_modules/jquery";
 
-import { Toast, Group, Radio, Checklist, XButton } from "vux";
+import { Toast, Group, Radio, Checklist, XButton, Rater } from "vux";
 
 import { dateFormat } from "vux";
 
@@ -45,7 +62,8 @@ export default {
     Radio,
     Checklist,
     XButton,
-    Tips
+    Tips,
+    Rater
   },
   data() {
     return {
@@ -55,7 +73,8 @@ export default {
       },
       answerList: [],
       isCompleted: false,
-      startTime: dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss")
+      startTime: dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss"),
+      raterText: ["很不满意", "", "", "", "很满意"]
     };
   },
   computed: {
@@ -153,207 +172,46 @@ export default {
           this.$router.push("info");
         });
     },
-    init() {
-      if (this.paperInit) {
-        // 如果载入过，需要删除重载
-        $.fn.fullpage.destroy("all");
-      }
-      let params = {
-        verticalCentered: true,
-        css3: true,
-        navigation: false,
-        easing: "easeInOutCubic",
-        loopHorizontal: false,
-        afterLoad: (anchorLink, index) => {
-          this.setCurIdx(index);
-        },
-        onLeave: (from, to, direction) => {
-          let isFromPageNotAnswered = this.answerList[from - 1] == -1;
-          let isToPageNotAnswered = this.answerList[to - 1] == -1;
 
-          // 如果源页面未答题且向下翻，则不允许翻页
-          if (direction == "down" && isFromPageNotAnswered) {
-            this.toast.show = true;
-            this.toast.msg = `第${from}题未作答`;
-            this.$nextTick(() => {
-              $.fn.fullpage.moveTo(from);
-            });
-          }
-
-          // 离线模式，判断答题顺序后不进入数据提交流程
-          if (!this.sport.isOnline) {
-            return;
-          }
-
-          // 在线模式不允许修改答案，离线模式可以修改
-          if (direction == "up" && !isToPageNotAnswered) {
-            this.toast.show = true;
-            this.toast.msg = `实时比赛不允许修改答案`;
-            this.$nextTick(() => {
-              $.fn.fullpage.moveTo(from);
-            });
-          }
-
-          // 实时答题，提交当前数据
-          this.submit();
-        }
-      };
-
-      this.el.fullpage(params);
-
-      this.paperInit = true;
-    },
     prepareData() {
       document.title = this.sport.name + "微信答题活动";
+      let answers = this.questionList.map(item => -1);
+      for (let i = 3; i < answers.length; i++) {
+        // 初始置为3颗星
+        answers[i] = 3;
+      }
 
-      this.answerList = this.questionList.map(item => -1);
+      this.answerList = answers;
     }
   },
   mounted() {
-    // if (!this.sport.isLogin) {
-    //   this.$router.push("/");
-    // } else {
-    //   // 如果答题次数超标，跳转至信息(防止按返回键继续答题)
-    //   if (!this.sport.isOnline && this.sport.curTimes > this.sport.maxTimes) {
-    //     this.$router.push("info");
-    //   }
-    //   this.prepareData();
-    //   this.init();
-    // }
     this.prepareData();
-    this.init();
   }
 };
 </script>
 <style scoped lang="less">
-@import "../assets/css/fullpage.css";
 @import "../assets/css/weui.css";
-.content {
+.container {
+  padding: 20px 10px;
+  width: 100%;
+}
+.section {
   margin: 0;
-  padding: 10px;
+  padding: 8px;
   color: #785a32;
-  background: url(http://www.cbpc.ltd/public/topic/201711/static/main.jpg) 0 0
-    no-repeat;
-  background-size: 100% 110%;
-}
-.submit {
-  margin: 20px;
-}
-.qa-num {
-  width: 100px;
-  height: 50px;
-  border: 1px solid #d2c7bb;
-  border-bottom: 0;
-  border-radius: 50px 50px 0 0;
-  overflow: hidden;
-  position: absolute;
-  top: -49px;
-  left: 50%;
-  margin-left: -50px;
-  text-align: center;
-  box-sizing: border-box;
-  z-index: 2;
-  color: #c1af96;
-  font-size: 20px;
-  background: #faf5f0;
-  background-clip: padding-box;
-  padding-top: 14px;
-  font-family: "HiraginoSansGB-W3", "微软雅黑", "Microsoft Yahei", "宋体",
-    "Arial Narrow", "HELVETICA";
-  font-weight: 400;
-}
-.qa-body {
-  border: 1px solid #d2c7bb;
-  border-radius: 5px;
-  box-shadow: 0 0 6px 2px rgba(210, 199, 187, 0.2);
-  background: #faf5f0;
-  background-clip: padding-box;
-  padding: 13px 0;
-  box-sizing: border-box;
-  overflow-y: auto;
-  min-height: 60vh;
-}
-
-/* Arrow */
-@arrow-color: rgb(90, 88, 84);
-.iSlider-arrow,
-.iSlider-arrow-prev {
-  position: absolute;
-  width: 3em;
-  height: 3em;
-  left: 0;
-  right: 0;
-  bottom: 5%;
-  margin: 0 auto;
-  border-top: 2px solid @arrow-color;
-  border-right: 2px solid @arrow-color;
-  z-index: 10000;
-  opacity: 0.8;
-  -webkit-animation: nextPage 1.2s linear infinite;
-}
-
-.iSlider-arrow-right {
-  position: absolute;
-  width: 2em;
-  height: 2em;
-  left: 82%;
-  right: 0;
-  bottom: 25%;
-  margin: auto 0;
-  border-top: 2px solid @arrow-color;
-  border-right: 2px solid @arrow-color;
-  z-index: 10000;
-  opacity: 0.8;
-  -webkit-animation: rightPage 1.2s linear infinite;
-}
-
-.iSlider-arrow-prev {
-  bottom: 1%;
-  -webkit-animation: prevPage 1.2s linear infinite;
-}
-
-@-webkit-keyframes rightPage {
-  0% {
-    -webkit-transform: translateX(10px) rotate(45deg);
-    opacity: 0.8;
-  }
-  50% {
-    -webkit-transform: translateX(20px) rotate(45deg);
-    opacity: 0.4;
-  }
-  100% {
-    -webkit-transform: translateX(40px) rotate(45deg);
-    opacity: 0;
-  }
-}
-
-@-webkit-keyframes nextPage {
-  0% {
-    -webkit-transform: translateY(40px) rotate(-45deg);
-    opacity: 0.8;
-  }
-  50% {
-    -webkit-transform: translateY(20px) rotate(-45deg);
-    opacity: 0.4;
-  }
-  100% {
-    -webkit-transform: translateY(10px) rotate(-45deg);
-    opacity: 0;
-  }
-}
-
-@-webkit-keyframes prevPage {
-  0% {
-    -webkit-transform: translateY(-40px) rotate(135deg);
-    opacity: 0.8;
-  }
-  50% {
-    -webkit-transform: translateY(-20px) rotate(135deg);
-    opacity: 0.4;
-  }
-  100% {
-    -webkit-transform: translateY(-10px) rotate(135deg);
-    opacity: 0;
+  background: #fff;
+  text-align: left;
+  &-item {
+    border: 1px solid #d2c7bb;
+    border-radius: 5px;
+    box-shadow: 0 0 6px 2px rgba(210, 199, 187, 0.2);
+    background: #faf5f0;
+    background-clip: padding-box;
+    padding: 5px 0;
+    box-sizing: border-box;
+    .rater-container {
+      padding: 0 15px 10px 15px;
+    }
   }
 }
 </style>

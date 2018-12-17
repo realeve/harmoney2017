@@ -1,0 +1,373 @@
+<template>
+  <div>
+    <div ref='fp'>
+      <div
+        class="section content"
+        v-for="(question,i) of questionList"
+        :key="i"
+      >
+        <span v-if="sport.testMode">得分:{{subScore}}</span>
+        <div style="position:relative;">
+          <div class="qa-num">{{i+1}}/{{questionList.length}}</div>
+          <div class="qa-body">
+            <group :title="`${question.title}`">
+              <radio
+                :options="question.option"
+                v-model="answerList[i]"
+              ></radio>
+            </group>
+          </div>
+        </div>
+        <div
+          class="submit"
+          v-if="i == questionList.length-1"
+        >
+          <x-button
+            :disabled="!isCompleted"
+            type="primary"
+            @click.native="submit()"
+          >提交</x-button>
+        </div>
+      </div>
+    </div>
+    <div class="iSlider-arrow"></div>
+    <toast v-model="toast.show">{{ toast.msg }}</toast>
+    <!-- <tips></tips> -->
+  </div>
+</template>
+<script>
+import "fullpage.js";
+import $ from "fullpage.js/node_modules/jquery";
+
+import { Toast, Group, Radio, Checklist, XButton } from "vux";
+
+import { dateFormat } from "vux";
+
+import { mapState } from "vuex";
+
+import questionJSON from "../assets/data/harmoney.json";
+
+import Tips from "../components/Tips.vue";
+import util from "../lib/common";
+let questionList = util.getHarmoney(questionJSON);
+
+export default {
+  name: "page",
+  components: {
+    Toast,
+    Group,
+    Radio,
+    Checklist,
+    XButton,
+    Tips
+  },
+  data() {
+    return {
+      toast: {
+        show: false,
+        msg: ""
+      },
+      answerList: [],
+      isCompleted: false,
+      startTime: dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss")
+    };
+  },
+  computed: {
+    ...mapState(["userInfo", "cdnUrl"]),
+    questionList() {
+      return questionList.slice(0, this.sport.questionNums);
+    },
+    sport: {
+      get() {
+        return this.$store.state.sport;
+      },
+      set(val) {
+        this.$store.commit("setSport", val);
+      }
+    },
+    url() {
+      return window.location.href.split("#")[0];
+    },
+    el() {
+      return $(this.$refs.fp);
+    },
+    tips: {
+      get() {
+        return this.$store.state.tips;
+      },
+      set(val) {
+        this.$store.commit("setTips", val);
+      }
+    },
+    paperInit: {
+      get() {
+        return this.$store.state.paperInit;
+      },
+      set(val) {
+        this.$store.commit("setPaperInit", val);
+      }
+    },
+    subScore() {
+      let score = 0;
+
+      this.answerList.forEach((item, i) => {
+        let curQuestion = this.questionList[i];
+        if (i > 2) {
+          score += item + 1;
+        }
+      });
+      return score;
+    }
+  },
+  watch: {
+    answerList(val) {
+      this.getCompleteStatus();
+    }
+  },
+  methods: {
+    getCompleteStatus() {
+      let flag = true;
+      for (let i = 0; flag && i < this.answerList.length; i++) {
+        let item = this.answerList[i];
+        if (item == -1) {
+          flag = false;
+        }
+      }
+      this.isCompleted = flag;
+    },
+    getSubmitData() {
+      let arr = ["A", "B", "C", "D", "E"];
+      let answer = this.answerList.map(item => arr[item]).join(",");
+      this.sport.curScore = this.subScore;
+      return {
+        start_time: this.startTime,
+        rec_time: dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss"),
+        score: this.subScore,
+        sid: this.sport.id,
+        uid: this.sport.uid,
+        answer
+      };
+    },
+    setCurIdx(slideIdx) {
+      let slideNum = this.questionList.length;
+      this.tips = slideNum > 1 ? `${slideIdx}/${slideNum}` : "";
+    },
+    submit() {
+      let params = this.getSubmitData();
+      params.s = "/addon/Api/Api/submitHarmoney";
+
+      this.$http
+        .jsonp(this.cdnUrl, {
+          params
+        })
+        .then(res => {
+          this.toast.show = true;
+          this.toast.msg = res.data.msg;
+          this.sport.curTimes++;
+          this.$router.push("info");
+        });
+    },
+    init() {
+      if (this.paperInit) {
+        // 如果载入过，需要删除重载
+        $.fn.fullpage.destroy("all");
+      }
+      let params = {
+        verticalCentered: true,
+        css3: true,
+        navigation: false,
+        easing: "easeInOutCubic",
+        loopHorizontal: false,
+        afterLoad: (anchorLink, index) => {
+          this.setCurIdx(index);
+        },
+        onLeave: (from, to, direction) => {
+          let isFromPageNotAnswered = this.answerList[from - 1] == -1;
+          let isToPageNotAnswered = this.answerList[to - 1] == -1;
+
+          // 如果源页面未答题且向下翻，则不允许翻页
+          if (direction == "down" && isFromPageNotAnswered) {
+            this.toast.show = true;
+            this.toast.msg = `第${from}题未作答`;
+            this.$nextTick(() => {
+              $.fn.fullpage.moveTo(from);
+            });
+          }
+
+          // 离线模式，判断答题顺序后不进入数据提交流程
+          if (!this.sport.isOnline) {
+            return;
+          }
+
+          // 在线模式不允许修改答案，离线模式可以修改
+          if (direction == "up" && !isToPageNotAnswered) {
+            this.toast.show = true;
+            this.toast.msg = `实时比赛不允许修改答案`;
+            this.$nextTick(() => {
+              $.fn.fullpage.moveTo(from);
+            });
+          }
+
+          // 实时答题，提交当前数据
+          this.submit();
+        }
+      };
+
+      this.el.fullpage(params);
+
+      this.paperInit = true;
+    },
+    prepareData() {
+      document.title = this.sport.name + "微信答题活动";
+
+      this.answerList = this.questionList.map(item => -1);
+    }
+  },
+  mounted() {
+    // if (!this.sport.isLogin) {
+    //   this.$router.push("/");
+    // } else {
+    //   // 如果答题次数超标，跳转至信息(防止按返回键继续答题)
+    //   if (!this.sport.isOnline && this.sport.curTimes > this.sport.maxTimes) {
+    //     this.$router.push("info");
+    //   }
+    //   this.prepareData();
+    //   this.init();
+    // }
+    this.prepareData();
+    this.init();
+  }
+};
+</script>
+<style scoped lang="less">
+@import "../assets/css/fullpage.css";
+@import "../assets/css/weui.css";
+.content {
+  margin: 0;
+  padding: 10px;
+  color: #785a32;
+  background: url(http://www.cbpc.ltd/public/topic/201711/static/main.jpg) 0 0
+    no-repeat;
+  background-size: 100% 110%;
+}
+.submit {
+  margin: 20px;
+}
+.qa-num {
+  width: 100px;
+  height: 50px;
+  border: 1px solid #d2c7bb;
+  border-bottom: 0;
+  border-radius: 50px 50px 0 0;
+  overflow: hidden;
+  position: absolute;
+  top: -49px;
+  left: 50%;
+  margin-left: -50px;
+  text-align: center;
+  box-sizing: border-box;
+  z-index: 2;
+  color: #c1af96;
+  font-size: 20px;
+  background: #faf5f0;
+  background-clip: padding-box;
+  padding-top: 14px;
+  font-family: "HiraginoSansGB-W3", "微软雅黑", "Microsoft Yahei", "宋体",
+    "Arial Narrow", "HELVETICA";
+  font-weight: 400;
+}
+.qa-body {
+  border: 1px solid #d2c7bb;
+  border-radius: 5px;
+  box-shadow: 0 0 6px 2px rgba(210, 199, 187, 0.2);
+  background: #faf5f0;
+  background-clip: padding-box;
+  padding: 13px 0;
+  box-sizing: border-box;
+  overflow-y: auto;
+  min-height: 60vh;
+}
+
+/* Arrow */
+@arrow-color: rgb(90, 88, 84);
+.iSlider-arrow,
+.iSlider-arrow-prev {
+  position: absolute;
+  width: 3em;
+  height: 3em;
+  left: 0;
+  right: 0;
+  bottom: 5%;
+  margin: 0 auto;
+  border-top: 2px solid @arrow-color;
+  border-right: 2px solid @arrow-color;
+  z-index: 10000;
+  opacity: 0.8;
+  -webkit-animation: nextPage 1.2s linear infinite;
+}
+
+.iSlider-arrow-right {
+  position: absolute;
+  width: 2em;
+  height: 2em;
+  left: 82%;
+  right: 0;
+  bottom: 25%;
+  margin: auto 0;
+  border-top: 2px solid @arrow-color;
+  border-right: 2px solid @arrow-color;
+  z-index: 10000;
+  opacity: 0.8;
+  -webkit-animation: rightPage 1.2s linear infinite;
+}
+
+.iSlider-arrow-prev {
+  bottom: 1%;
+  -webkit-animation: prevPage 1.2s linear infinite;
+}
+
+@-webkit-keyframes rightPage {
+  0% {
+    -webkit-transform: translateX(10px) rotate(45deg);
+    opacity: 0.8;
+  }
+  50% {
+    -webkit-transform: translateX(20px) rotate(45deg);
+    opacity: 0.4;
+  }
+  100% {
+    -webkit-transform: translateX(40px) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes nextPage {
+  0% {
+    -webkit-transform: translateY(40px) rotate(-45deg);
+    opacity: 0.8;
+  }
+  50% {
+    -webkit-transform: translateY(20px) rotate(-45deg);
+    opacity: 0.4;
+  }
+  100% {
+    -webkit-transform: translateY(10px) rotate(-45deg);
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes prevPage {
+  0% {
+    -webkit-transform: translateY(-40px) rotate(135deg);
+    opacity: 0.8;
+  }
+  50% {
+    -webkit-transform: translateY(-20px) rotate(135deg);
+    opacity: 0.4;
+  }
+  100% {
+    -webkit-transform: translateY(-10px) rotate(135deg);
+    opacity: 0;
+  }
+}
+</style>

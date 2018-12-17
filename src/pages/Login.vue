@@ -90,12 +90,11 @@ export default {
     },
     async init() {
       let { data: depts } = await db.getCbpcHarmoneyUserlistDepts();
-      this.dptList = R.flatten(depts);
-
+      this.dptList = [R.flatten(depts)];
       this.loadUserInfo();
     },
     loadUserInfo() {
-      let userInfo = localStorage.getItem("userInfoHarmoney_2018");
+      let userInfo = localStorage.getItem("userInfoHarmoney");
       if (userInfo == null) {
         return;
       }
@@ -108,47 +107,21 @@ export default {
       };
     },
     submit: async function() {
-      let params = {
-        username: this.sport.userName,
-        psw: this.sport.cardNo,
+      let { data, rows } = await db.getCbpcHarmoneyUserlist({
         dept: this.sport.dpt[0],
-        s: "/addon/Api/Api/login"
-      };
-      let uid = await this.$http
-        .jsonp(this.cdnUrl, {
-          params
-        })
-        .then(res => {
-          let obj = res.data[0];
-          if (typeof obj == "undefined") {
-            obj = { id: 0 };
-          }
-          return obj.id;
-        });
-      // console.log(uid);
+        username: this.sport.userName,
+        id_card: this.sport.cardNo
+      });
 
       // 卡号或部门输入错误
-      if (uid == 0) {
+      if (rows == 0) {
         this.toast.show = true;
         this.toast.msg = "登录失败";
         return;
       }
+      let [{ uid, hid }] = data;
 
-      params = {
-        uid,
-        sid: this.sport.id,
-        s: "/addon/Api/Api/getHarmoneyPaper"
-      };
-      let times = await this.$http
-        .jsonp(this.cdnUrl, {
-          params
-        })
-        .then(res => {
-          let obj = res.data;
-          return obj[0].num;
-        });
-
-      if (times >= this.sport.maxTimes) {
+      if (hid > 0 || rows > 1) {
         this.toast.show = true;
         this.toast.msg = "答题次数用完";
         this.jump("info");
@@ -157,9 +130,9 @@ export default {
 
       // 登录成功
       this.sport.isLogin = true;
-      this.sport.curTimes = parseInt(times) + 1;
+      this.sport.curTimes = 1;
 
-      params = {
+      let params = {
         username: this.sport.userName,
         psw: this.sport.cardNo,
         dept: this.sport.dpt[0],
