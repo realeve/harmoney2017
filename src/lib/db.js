@@ -17,7 +17,7 @@ export const getCbpcHarmoneyUserlist = (params) =>
  */
 export const getCbpcHarmoneyUserlistDepts = () =>
   axios({
-    url: '/115/5e946191de/100.array'
+    url: '/115/5e946191de/10.array'
   });
 
 /**
