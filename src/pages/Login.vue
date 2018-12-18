@@ -123,7 +123,7 @@ export default {
       let { data, rows } = await db.getCbpcHarmoneyUserlist({
         dept: this.sport.dpt[0],
         username: this.sport.userName,
-        id_card: this.sport.cardNo
+        id_card: this.sport.cardNo.toUpperCase()
       });
 
       // 卡号或部门输入错误
