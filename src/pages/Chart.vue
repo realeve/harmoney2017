@@ -3,20 +3,27 @@
     <div class="content">
       <p class="title margin-top-20">2017年度和谐企业创建<br>二级单位员工满意度测评问卷</p>
       <p class="margin-top-20 tips">截止至 {{now}} ,本次活动共有{{this.papers.length}}人参与测评，统计结果如下：</p>
-      <div class="card" v-for="(item,i) of chartData" :key="i">
+      <div
+        class="card"
+        v-for="(item,i) of chartData"
+        :key="i"
+      >
         <div class="content">
           <div>{{i+1}}.{{item.title}}</div>
-          <v-chart :data="item.data" :height="(i==0?600:250)+'px'"></v-chart>
+          <v-chart
+            :data="item.data"
+            :height="(i==0?600:250)+'px'"
+          ></v-chart>
         </div>
       </div>
     </div>
-    <v-foot/>
+    <v-foot />
   </div>
 </template>
 <script>
 import { mapState } from "vuex";
 import { dateFormat } from "vux";
-import questionJSON from "../assets/data/harmoney.json";
+import questionJSON from "../assets/data/harmoney";
 import VChart from "../components/Chart";
 
 export default {

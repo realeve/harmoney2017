@@ -8,7 +8,7 @@
       <span v-if="sport.testMode">得分:{{subScore}}</span>
       <div class="section-item">
         <group
-          v-if="i<3"
+          v-if="question.option"
           :title="`${i+1}.${question.title}`"
         >
           <radio
@@ -18,13 +18,22 @@
         </group>
         <div v-else>
           <div class="weui-cells__title">{{i+1}}.{{question.title}}</div>
-          <div class="rater-container">
+          <div
+            v-if="!question.title.includes('建议')"
+            class="rater-container"
+          >
             <rater
               :min="1"
               :max="5"
               v-model="answerList[i]"
             />
-            <label class="bold">{{raterText[answerList[i]-1]}}</label>
+            <label class="text">{{raterText[answerList[i]-1]}}</label>
+          </div>
+          <div v-else>
+            <x-textarea
+              v-model="answerList[i]"
+              placeholder="可选填"
+            ></x-textarea>
           </div>
         </div>
       </div>
@@ -39,16 +48,13 @@
   </div>
 </template>
 <script>
-// import "fullpage.js";
-// import $ from "fullpage.js/node_modules/jquery";
-
-import { Toast, Group, Radio, Checklist, XButton, Rater } from "vux";
+import { Toast, XTextarea, Group, Radio, Checklist, XButton, Rater } from "vux";
 
 import { dateFormat } from "vux";
 
 import { mapState } from "vuex";
 
-import questionJSON from "../assets/data/harmoney.json";
+import questionJSON from "../assets/data/harmoney";
 
 import Tips from "../components/Tips.vue";
 import util from "../lib/common";
@@ -63,7 +69,8 @@ export default {
     Checklist,
     XButton,
     Tips,
-    Rater
+    Rater,
+    XTextarea
   },
   data() {
     return {
@@ -74,14 +81,12 @@ export default {
       answerList: [],
       isCompleted: false,
       startTime: dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss"),
-      raterText: ["很不满意", "", "", "", "很满意"]
+      raterText: ["很不满意", "不太满意", "一般", "满意", "非常满意"],
+      questionList
     };
   },
   computed: {
     ...mapState(["userInfo", "cdnUrl"]),
-    questionList() {
-      return questionList.slice(0, this.sport.questionNums);
-    },
     sport: {
       get() {
         return this.$store.state.sport;
@@ -175,13 +180,13 @@ export default {
 
     prepareData() {
       document.title = this.sport.name + "微信答题活动";
-      let answers = this.questionList.map(item => -1);
-      for (let i = 3; i < answers.length; i++) {
-        // 初始置为3颗星
-        answers[i] = 3;
-      }
+      // let answers = this.questionList.map(item => -1);
+      // for (let i = 3; i < answers.length; i++) {
+      //   // 初始置为3颗星
+      //   answers[i] = 3;
+      // }
 
-      this.answerList = answers;
+      // this.answerList = answers;
     }
   },
   mounted() {
@@ -202,7 +207,7 @@ export default {
   background: #fff;
   text-align: left;
   &-item {
-    border: 1px solid #d2c7bb;
+    border: 1px solid #e2e2e2;
     border-radius: 5px;
     box-shadow: 0 0 6px 2px rgba(210, 199, 187, 0.2);
     background: #faf5f0;
@@ -211,7 +216,16 @@ export default {
     box-sizing: border-box;
     .rater-container {
       padding: 0 15px 10px 15px;
+      display: flex;
+      align-items: center;
+      .text {
+        font-size: 16px;
+        padding-left: 10px;
+      }
     }
   }
+}
+.submit {
+  margin-top: 10px;
 }
 </style>
