@@ -8,7 +8,7 @@
       <span v-if="sport.testMode">部门:{{score_dept}},公司：{{score_company}}</span>
       <div class="section-item">
         <group
-          v-if="question.option"
+          v-if="typeof question.option!='undefined'"
           :title="`${i+1}.${question.title}`"
         >
           <radio
@@ -19,7 +19,7 @@
         <div v-else>
           <div class="weui-cells__title">{{i+1}}.{{question.title}}</div>
           <div
-            v-if="!question.title.includes('建议')"
+            v-if="question.title.indexOf('建议')>-1"
             class="rater-container"
           >
             <rater
