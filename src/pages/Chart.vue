@@ -12,7 +12,7 @@
           <div>{{i+1}}.{{item.title}}</div>
           <v-chart
             :data="item.data"
-            :height="(i==0?600:250)+'px'"
+            :height="(i==0?800:250)+'px'"
           ></v-chart>
         </div>
       </div>
@@ -150,7 +150,15 @@ export default {
     async loadPapers() {
       this.papers = await db.getCbpcHarmoney().then(res => res.data);
       // 各部门参与情况
-      this.depts = await db.getCbpcHarmoneyDept().then(res => res.data);
+      this.depts = await db.getCbpcHarmoneyDept().then(res =>
+        res.data.map((item, i) => {
+          if (item.name.indexOf("（") > -1) {
+            item.name = item.name.split("（")[0];
+          }
+          item.name = `${res.data.length - i}.${item.name}`;
+          return item;
+        })
+      );
     }
   },
   mounted() {

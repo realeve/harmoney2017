@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <v-console />
+    <!-- <v-console /> -->
     <!-- <v-header/> -->
     <loading v-model="isLoading" />
     <router-view />
@@ -15,12 +15,12 @@ import { querystring } from "vux";
 
 import { mapState } from "vuex";
 import * as db from "./lib/db";
-import VConsole from "./components/VConsole";
+// import VConsole from "./components/VConsole";
 export default {
   name: "app",
   components: {
-    Loading,
-    VConsole
+    Loading
+    // VConsole
   },
   data() {
     return {

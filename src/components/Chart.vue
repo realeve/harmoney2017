@@ -1,5 +1,9 @@
 <template>
-  <div class="chart" ref="chart" :style="{height}"></div>
+  <div
+    class="chart"
+    ref="chart"
+    :style="{height}"
+  ></div>
 </template>
 <script>
 import echarts from "echarts";
@@ -63,12 +67,12 @@ export default {
             type: "pie",
             radius: ["40%", "55%"],
             startAngle: 45,
-            data:data.filter(item=>item.value>0),
+            data: data.filter(item => item.value > 0),
             label: {
               normal: {
                 formatter: function(param) {
                   return (
-                    param.name.replace('(','\n(') +
+                    param.name.replace("(", "\n(") +
                     "\n(" +
                     param.percent.toFixed(2) +
                     "%)\n" +
@@ -88,7 +92,7 @@ export default {
           trigger: "item"
         },
         grid: {
-          x: 80
+          x: 120
         },
         xAxis: {
           type: "value",
@@ -107,7 +111,8 @@ export default {
               normal: {
                 show: true,
                 position: "right",
-                formatter: a => `${a.value}%(${this.data[a.dataIndex].curNum}人)`
+                formatter: a =>
+                  `${a.value}%(${this.data[a.dataIndex].curNum}人)`
               }
             },
             data
