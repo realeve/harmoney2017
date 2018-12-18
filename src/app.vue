@@ -13,6 +13,7 @@ import { Loading } from "vux";
 import { querystring } from "vux";
 
 import { mapState } from "vuex";
+import * as db from "./lib/db";
 export default {
   name: "app",
   components: {
@@ -76,15 +77,12 @@ export default {
   },
   methods: {
     wxPermissionInit() {
-      let params = {
-        s: "/addon/Api/Api/getSignature",
-        url: this.url
-      };
-      return this.$http
-        .jsonp(this.cdnUrl, {
-          params
-        })
-        .then(res => res.data);
+      return axios({
+        params: {
+          s: "/weixin/signature",
+          url: this.url
+        }
+      });
     },
     wxReady(obj) {
       let config = {
@@ -146,28 +144,25 @@ export default {
       this.getWXInfo();
     },
     getWXInfo() {
-      let params = {
-        s: "/addon/Api/Api/getUserInfo",
-        code: this.code
-      };
-      this.$http
-        .jsonp(this.cdnUrl, {
-          params
-        })
-        .then(res => {
-          this.userInfo = res.data;
-          if (Reflect.get(res.data, "nickname")) {
-            localStorage.setItem("wx_userinfo", JSON.stringify(res.data));
-          }
-        });
+      axios({
+        params: {
+          s: "/weixin/user_info",
+          code: this.code
+        }
+      }).then(data => {
+        this.userInfo = data;
+        if (Reflect.get(res.data, "nickname")) {
+          localStorage.setItem("wx_userinfo", JSON.stringify(res.data));
+        }
+      });
     },
     wxInit() {
       if (this.sport.loadWXInfo && !this.needRedirect()) {
         this.getWXUserInfo();
       }
-      this.wxPermissionInit().then(res => {
+      this.wxPermissionInit().then(data => {
         this.shouldShare = true;
-        this.wxReady(res);
+        this.wxReady(data);
         this.initWxShare();
         this.recordReadNum();
       });
@@ -183,17 +178,10 @@ export default {
       return false;
     },
     recordReadNum() {
-      if (location.href.includes("localhost")) {
+      if (location.href.indexOf("localhost") > -1) {
         return;
       }
-      let url = window.location.href.split("?")[0];
-      let params = {
-        s: "/addon/Api/Api/recordReadNum",
-        url
-      };
-      this.$http.jsonp(this.cdnUrl, {
-        params
-      });
+      db.addCommonVisitCount(window.location.href.split("?")[0]);
     }
   },
   created() {

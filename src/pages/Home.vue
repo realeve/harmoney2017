@@ -27,9 +27,10 @@
       </div>
       <div class="btn-wrapper margin-top-20">
         <x-button
+          :disabled="isEnd"
           type="primary"
           @click.native="jump('login')"
-        >登录</x-button>
+        >{{isEnd ? "活动已结束" : "登录"}}</x-button>
         <x-button @click.native="jump('chart')">查看汇总</x-button>
       </div>
     </div>
@@ -38,7 +39,7 @@
   </div>
 </template>
 <script>
-import { XButton, Toast } from "vux";
+import { XButton, Toast, dateFormat } from "vux";
 
 import { mapState } from "vuex";
 
@@ -71,17 +72,22 @@ export default {
         this.$store.commit("setSport", val);
       }
     },
-    showBtn() {
-      let username = this.sport.userName;
-      let flag = false;
-      let userList = ["李宾", "何苗", "尹放", "时延风", "唐晓琴"];
-      userList.forEach(item => {
-        if (item == username) {
-          flag = true;
-        }
-      });
-      return flag;
+    isEnd() {
+      return (
+        dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss") > "2018-12-21 23:59:59"
+      );
     }
+    // showBtn() {
+    //   let username = this.sport.userName;
+    //   let flag = false;
+    //   let userList = ["李宾", "何苗", "尹放", "时延风", "唐晓琴"];
+    //   userList.forEach(item => {
+    //     if (item == username) {
+    //       flag = true;
+    //     }
+    //   });
+    //   return flag;
+    // }
   },
   methods: {
     jump(router) {

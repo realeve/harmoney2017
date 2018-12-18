@@ -1,12 +1,19 @@
 <template>
   <div class="home">
     <div class="content">
-      <msg :title="title" :description="desc" :icon="icon"></msg>
-      <div v-show="showBtn" class="btn-wrapper margin-top-20">
-        <x-button type="primary" @click.native="jump('chart')">查看汇总</x-button>
+      <msg
+        :title="title"
+        :description="desc"
+        :icon="icon"
+      ></msg>
+      <div class="btn-wrapper margin-top-20">
+        <x-button
+          type="primary"
+          @click.native="jump('chart')"
+        >查看汇总</x-button>
       </div>
     </div>
-    <v-foot/>
+    <v-foot />
   </div>
 </template>
 
@@ -32,18 +39,18 @@ export default {
       set(val) {
         this.$store.commit("setSport", val);
       }
-    },
-    showBtn() {
-      let username = this.sport.userName;
-      let flag = false;
-      let userList = ["李宾", "何苗", "尹放", "时延风", "唐晓琴"];
-      userList.forEach(item => {
-        if (item == username) {
-          flag = true;
-        }
-      });
-      return flag;
     }
+    // showBtn() {
+    //   let username = this.sport.userName;
+    //   let flag = false;
+    //   let userList = ["李宾", "何苗", "尹放", "时延风", "唐晓琴"];
+    //   userList.forEach(item => {
+    //     if (item == username) {
+    //       flag = true;
+    //     }
+    //   });
+    //   return flag;
+    // }
   },
   methods: {
     jump(router) {

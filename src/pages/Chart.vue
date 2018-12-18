@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <div class="content">
-      <p class="title margin-top-20">2017年度和谐企业创建<br>二级单位员工满意度测评问卷</p>
+      <p class="title margin-top-20">2018年度公司和谐企业创建<br>员工满意度测评问卷</p>
       <p class="margin-top-20 tips">截止至 {{now}} ,本次活动共有{{this.papers.length}}人参与测评，统计结果如下：</p>
       <div
         class="card"
@@ -25,6 +25,7 @@ import { mapState } from "vuex";
 import { dateFormat } from "vux";
 import questionJSON from "../assets/data/harmoney";
 import VChart from "../components/Chart";
+import * as db from "../lib/db";
 
 export default {
   components: {
@@ -93,15 +94,20 @@ export default {
         }
       ];
 
-      questionJSON.forEach(item => {
+      questionJSON.slice(0, questionJSON.length - 2).forEach(item => {
+        item.option = item.option || [
+          "很不满意",
+          "不太满意",
+          "一般",
+          "满意",
+          "非常满意"
+        ];
         let obj = {
           title: item.title,
-          data: item.option.map(name => {
-            return {
-              name,
-              value: 0
-            };
-          })
+          data: item.option.map(name => ({
+            name,
+            value: 0
+          }))
         };
         data.push(obj);
       });
@@ -141,31 +147,14 @@ export default {
     }
   },
   methods: {
-    loadPapers: async function() {
-      let params = {
-        sid: this.sport.id,
-        s: "/addon/Api/Api/countHarmoney"
-      };
-
-      this.papers = await this.$http
-        .jsonp(this.cdnUrl, {
-          params
-        })
-        .then(res => res.data);
-      params = {
-        s: "/addon/Api/Api/deptHarmoney"
-      };
-
+    async loadPapers() {
+      this.papers = await db.getCbpcHarmoney().then(res => res.data);
       // 各部门参与情况
-      this.depts = await this.$http
-        .jsonp(this.cdnUrl, {
-          params
-        })
-        .then(res => res.data);
+      this.depts = await db.getCbpcHarmoneyDept().then(res => res.data);
     }
   },
   mounted() {
-    document.title = "2017年度和谐企业创建";
+    document.title = "2018年度和谐企业创建";
     this.loadPapers();
   }
 };

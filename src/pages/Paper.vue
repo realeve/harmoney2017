@@ -5,7 +5,7 @@
       v-for="(question,i) of questionList"
       :key="i"
     >
-      <span v-if="sport.testMode">得分:{{subScore}}</span>
+      <span v-if="sport.testMode">部门:{{score_dept}},公司：{{score_company}}</span>
       <div class="section-item">
         <group
           v-if="question.option"
@@ -32,7 +32,7 @@
           <div v-else>
             <x-textarea
               v-model="answerList[i]"
-              placeholder="可选填"
+              placeholder=" 可选填"
             ></x-textarea>
           </div>
         </div>
@@ -58,6 +58,7 @@ import questionJSON from "../assets/data/harmoney";
 
 import Tips from "../components/Tips.vue";
 import util from "../lib/common";
+import * as db from "../lib/db";
 let questionList = util.getHarmoney(questionJSON);
 
 export default {
@@ -98,9 +99,6 @@ export default {
     url() {
       return window.location.href.split("#")[0];
     },
-    el() {
-      return $(this.$refs.fp);
-    },
     tips: {
       get() {
         return this.$store.state.tips;
@@ -109,24 +107,35 @@ export default {
         this.$store.commit("setTips", val);
       }
     },
-    paperInit: {
-      get() {
-        return this.$store.state.paperInit;
-      },
-      set(val) {
-        this.$store.commit("setPaperInit", val);
-      }
-    },
-    subScore() {
+    score_dept() {
       let score = 0;
-
-      this.answerList.forEach((item, i) => {
-        let curQuestion = this.questionList[i];
-        if (i > 2) {
-          score += item + 1;
+      for (let i = 10; i < this.questionList.length - 2; i++) {
+        let curQuestion = this.answerList[i] || 0;
+        if (this.questionList[i].option) {
+          curQuestion = 0;
         }
+        score += curQuestion;
+      }
+      return score;
+    },
+    score_company() {
+      let score = 0;
+      [3, 4, 5, 6, 9].forEach(i => {
+        let curQuestion = this.answerList[i] || 0;
+        if (this.questionList[i].option) {
+          curQuestion = 0;
+        }
+        score += curQuestion;
       });
       return score;
+    },
+    // 对公司的建议
+    suggest_company() {
+      return this.answerList[32] || "";
+    },
+    // 对部门的建议
+    suggest_dept() {
+      return this.answerList[33] || "";
     }
   },
   watch: {
@@ -137,9 +146,10 @@ export default {
   methods: {
     getCompleteStatus() {
       let flag = true;
-      for (let i = 0; flag && i < this.answerList.length; i++) {
+      // 最后2题不计是否答完
+      for (let i = 0; flag && i < this.questionList.length - 2; i++) {
         let item = this.answerList[i];
-        if (item == -1) {
+        if (typeof item == "undefined") {
           flag = false;
         }
       }
@@ -147,46 +157,42 @@ export default {
     },
     getSubmitData() {
       let arr = ["A", "B", "C", "D", "E"];
-      let answer = this.answerList.map(item => arr[item]).join(",");
-      this.sport.curScore = this.subScore;
+      let answer = this.answerList
+        .slice(0, this.answerList.length - 2)
+        .map((item, i) =>
+          this.questionList[i].option ? arr[item] : arr[item - 1]
+        )
+        .join(",");
+      this.sport.curScore = this.score_dept + this.score_company;
+
       return {
         start_time: this.startTime,
         rec_time: dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss"),
-        score: this.subScore,
-        sid: this.sport.id,
+        score_dept: this.score_dept,
+        score_company: this.score_company,
+        suggest_company: this.suggest_company,
+        suggest_dept: this.suggest_dept,
         uid: this.sport.uid,
         answer
       };
     },
-    setCurIdx(slideIdx) {
-      let slideNum = this.questionList.length;
-      this.tips = slideNum > 1 ? `${slideIdx}/${slideNum}` : "";
-    },
-    submit() {
+    async submit() {
       let params = this.getSubmitData();
-      params.s = "/addon/Api/Api/submitHarmoney";
-
-      this.$http
-        .jsonp(this.cdnUrl, {
-          params
-        })
-        .then(res => {
-          this.toast.show = true;
-          this.toast.msg = res.data.msg;
-          this.sport.curTimes++;
-          this.$router.push("info");
-        });
+      let { data } = await db.addCbpcHarmoney(params);
+      console.log(params);
+      if (data[0].id > 0) {
+        this.toast.show = true;
+        this.toast.msg = "提交成功";
+        this.sport.curTimes++;
+        this.$router.push("info");
+      }
     },
 
     prepareData() {
       document.title = this.sport.name + "微信答题活动";
-      // let answers = this.questionList.map(item => -1);
-      // for (let i = 3; i < answers.length; i++) {
-      //   // 初始置为3颗星
-      //   answers[i] = 3;
-      // }
-
-      // this.answerList = answers;
+      if (this.sport.uid == 0) {
+        this.$router.push("/login");
+      }
     }
   },
   mounted() {

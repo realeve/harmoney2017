@@ -31,10 +31,10 @@
       </template>
       <div class="btn">
         <x-button
-          :disabled="!shouldCommit"
+          :disabled="!shouldCommit||isEnd"
           type="primary"
           @click.native="submit"
-        >登录</x-button>
+        >{{isEnd ? "活动已结束" : "登录"}}</x-button>
       </div>
     </group>
     <toast v-model="toast.show">{{ toast.msg }}</toast>
@@ -42,7 +42,15 @@
   </div>
 </template>
 <script>
-import { XButton, XInput, Group, Toast, Picker, GroupTitle } from "vux";
+import {
+  XButton,
+  XInput,
+  Group,
+  Toast,
+  Picker,
+  GroupTitle,
+  dateFormat
+} from "vux";
 
 import { mapState } from "vuex";
 import * as db from "../lib/db";
@@ -82,6 +90,11 @@ export default {
       set(val) {
         this.$store.commit("setSport", val);
       }
+    },
+    isEnd() {
+      return (
+        dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss") > "2018-12-21 23:59:59"
+      );
     }
   },
   methods: {
