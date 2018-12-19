@@ -139,7 +139,9 @@ export default {
         answers.forEach((answer, idx) => {
           let code = answer.charCodeAt() - 65;
           // 选项记数
-          data[idx + 3].data[code].value++;
+          if (typeof data[idx + 3].data[code] != "undefined") {
+            data[idx + 3].data[code].value++;
+          }
         });
       });
 
