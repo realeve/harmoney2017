@@ -152,12 +152,28 @@ export default {
     async loadPapers() {
       this.papers = await db.getCbpcHarmoney().then(res => res.data);
       // 各部门参与情况
-      this.depts = await db.getCbpcHarmoneyDept().then(res =>
-        res.data.map((item, i) => {
+      this.depts = await db.getCbpcHarmoneyDept().then(({ data }) =>
+        data.map((item, i) => {
           if (item.name.indexOf("（") > -1) {
             item.name = item.name.split("（")[0];
           }
-          item.name = `${res.data.length - i}.${item.name}`;
+          if (item.name.includes("公司")) {
+            switch (item.name) {
+              case "中钞金服科技有限公司":
+                item.name = "中钞金服";
+                break;
+              case "中钞长城贵金属有限公司":
+                item.name = "长城公司";
+                break;
+              case "成都金鼎安全印制有限责任公司":
+                item.name = "金鼎公司";
+                break;
+              case "成钞物业管理有限公司":
+                item.name = "物业公司";
+                break;
+            }
+          }
+          item.name = `${data.length - i}.${item.name}`;
           return item;
         })
       );
