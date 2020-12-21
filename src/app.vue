@@ -19,7 +19,7 @@ import * as db from "./lib/db";
 export default {
   name: "app",
   components: {
-    Loading
+    Loading,
     // VConsole
   },
   data() {
@@ -27,7 +27,7 @@ export default {
       code: "",
       apiId: "wx762c9153df774440",
       title: "",
-      shouldShare: false
+      shouldShare: false,
     };
   },
   computed: {
@@ -38,7 +38,7 @@ export default {
       },
       set(val) {
         this.$store.commit("updateLoadingStatus", val);
-      }
+      },
     },
     userInfo: {
       get() {
@@ -46,7 +46,7 @@ export default {
       },
       set(val) {
         this.$store.commit("setUserinfo", val);
-      }
+      },
     },
     // 签名用URL
     url() {
@@ -67,24 +67,24 @@ export default {
     shouldInitShare() {
       // && this.sport.curScore >= this.sport.minPrizeScore
       return this.sport.isLogin && this.shouldShare;
-    }
+    },
   },
   watch: {
     shouldInitShare(val) {
       if (!val) {
         return;
       }
-      this.title = `成都印钞有限公司2018年度和谐企业创建正在进行中...`;
+      this.title = `成都印钞有限公司2020年度和谐企业创建正在进行中...`;
       this.initWxShare();
-    }
+    },
   },
   methods: {
     wxPermissionInit() {
       return axios({
         params: {
           s: "/weixin/signature",
-          url: this.url
-        }
+          url: this.url,
+        },
       });
     },
     wxReady(obj) {
@@ -97,8 +97,8 @@ export default {
         jsApiList: [
           "onMenuShareAppMessage",
           "onMenuShareTimeline",
-          "hideMenuItems"
-        ]
+          "hideMenuItems",
+        ],
       };
       this.$wechat.config(config);
     },
@@ -111,8 +111,8 @@ export default {
           imgUrl: "http://cbpm.sinaapp.com/cdn/logo/cbpc.jpg",
           type: "",
           dataUrl: "",
-          success: function() {},
-          cancel: function() {}
+          success: function () {},
+          cancel: function () {},
         };
         this.$wechat.onMenuShareAppMessage(option);
         this.$wechat.onMenuShareTimeline(option);
@@ -130,8 +130,8 @@ export default {
             "menuItem:readMode",
             "menuItem:openWithQQBrowser",
             "menuItem:openWithSafari",
-            "menuItem:share:email"
-          ]
+            "menuItem:share:email",
+          ],
         });
       });
     },
@@ -150,9 +150,9 @@ export default {
       axios({
         params: {
           s: "/weixin/user_info",
-          code: this.code
-        }
-      }).then(data => {
+          code: this.code,
+        },
+      }).then((data) => {
         this.userInfo = data;
         if (Reflect.get(res.data, "nickname")) {
           localStorage.setItem("wx_userinfo", JSON.stringify(res.data));
@@ -163,7 +163,7 @@ export default {
       if (this.sport.loadWXInfo && !this.needRedirect()) {
         this.getWXUserInfo();
       }
-      this.wxPermissionInit().then(data => {
+      this.wxPermissionInit().then((data) => {
         this.shouldShare = true;
         this.wxReady(data);
         this.initWxShare();
@@ -185,7 +185,7 @@ export default {
         return;
       }
       db.addCommonVisitCount(window.location.href.split("?")[0]);
-    }
+    },
   },
   created() {
     this.title = this.sport.name;
@@ -201,13 +201,13 @@ export default {
         country: "中国",
         headimgurl:
           "http://wx.qlogo.cn/mmhead/Q3auHgzwzM7RSAYiaxiaC1lOZYicWic9YZKEFJ2TKEfh3pFJibLvf7IxdLQ/0",
-        privilege: []
+        privilege: [],
       };
     } else {
       // 正式环境微信载入
       this.wxInit();
     }
-  }
+  },
 };
 </script>
 

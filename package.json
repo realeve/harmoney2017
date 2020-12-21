@@ -13,6 +13,7 @@
     "echarts": "^3.8.5",
     "fastclick": "^1.0.6",
     "fullpage.js": "^2.9.4",
+    "lodash": "^4.17.20",
     "qs": "^6.6.0",
     "ramda": "^0.26.1",
     "vconsole": "^3.2.0",

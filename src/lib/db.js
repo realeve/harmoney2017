@@ -1,14 +1,20 @@
-import { axios } from './axios';
+import { axios } from "./axios";
 
 /**
 *   @database: { 微信开发 }
 *   @desc:     { 和谐满意度调查_2018_登录 } 
     const { dept, username, id_card } = params;
 */
+// export const getCbpcHarmoneyUserlist = (params) =>
+//   axios({
+//     url: "/114/dc94ff60a8.json",
+//     params,
+//   });
+
 export const getCbpcHarmoneyUserlist = (params) =>
   axios({
-    url: '/114/dc94ff60a8.json',
-    params
+    url: "/359/99a4277875.json",
+    params,
   });
 
 /**
@@ -17,7 +23,11 @@ export const getCbpcHarmoneyUserlist = (params) =>
  */
 export const getCbpcHarmoneyUserlistDepts = () =>
   axios({
-    url: '/115/5e946191de/10.array'
+    url: "/242/6a4d61905e/10.array",
+    // url: "/115/5e946191de/10.array",
+  }).then((res) => {
+    let data = res.data.map((item) => item[1]);
+    return { ...res, data };
   });
 
 /**
@@ -27,8 +37,8 @@ export const getCbpcHarmoneyUserlistDepts = () =>
 */
 export const addCbpcHarmoney = (params) =>
   axios({
-    url: '/116/c70a2a16db.json',
-    params
+    url: "/116/c70a2a16db.json",
+    params,
   });
 
 /**
@@ -37,7 +47,7 @@ export const addCbpcHarmoney = (params) =>
  */
 export const getCbpcHarmoney = () =>
   axios({
-    url: '/117/a40d2beaba.json'
+    url: "/117/a40d2beaba.json",
   });
 
 /**
@@ -46,7 +56,7 @@ export const getCbpcHarmoney = () =>
  */
 export const getCbpcHarmoneyDept = () =>
   axios({
-    url: '/118/00b75ddd82.json'
+    url: "/118/00b75ddd82.json",
   });
 
 /**
@@ -55,8 +65,8 @@ export const getCbpcHarmoneyDept = () =>
  */
 export const addCommonVisitCount = (url) =>
   axios({
-    url: '/5/4c908bffac.json',
+    url: "/5/4c908bffac.json",
     params: {
-      url
-    }
+      url,
+    },
   });

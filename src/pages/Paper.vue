@@ -1,38 +1,27 @@
 <template>
   <div class="container">
-    <div
-      class="section"
-      v-for="(question,i) of questionList"
-      :key="i"
-    >
-      <span v-if="sport.testMode">部门:{{score_dept}},公司：{{score_company}}</span>
+    <div class="section" v-for="(question, i) of questionList" :key="i">
+      <span v-if="sport.testMode"
+        >部门:{{ score_dept }},公司：{{ score_company }}</span
+      >
       <div class="section-item">
-        <group
-          v-if="question.option"
-          :title="`${i+1}.${question.title}`"
-        >
-          <radio
-            :options="question.option"
-            v-model="answerList[i]"
-          ></radio>
+        <group v-if="question.option" :title="`${i + 1}.${question.title}`">
+          <radio :options="question.option" v-model="answerList[i]"></radio>
         </group>
         <div v-else>
-          <div class="weui-cells__title">{{i+1}}.{{question.title}}</div>
+          <div class="weui-cells__title">{{ i + 1 }}.{{ question.title }}</div>
           <div
-            v-if="question.title.indexOf('建议')==-1"
+            v-if="question.title.indexOf('建议') == -1"
             class="rater-container"
           >
-            <rater
-              :min="1"
-              :max="5"
-              v-model="answerList[i]"
-            />
-            <label class="text">{{raterText[answerList[i]-1]}}</label>
+            <rater :min="1" :max="5" v-model="answerList[i]" />
+            <label class="text">{{ raterText[answerList[i] - 1] }}</label>
           </div>
           <div v-else>
             <x-textarea
               v-model="answerList[i]"
-              placeholder=" 可选填"
+              :placeholder="question.placeholder"
+              :rows="6"
             ></x-textarea>
           </div>
         </div>
@@ -43,7 +32,8 @@
       type="primary"
       @click.native="submit()"
       class="submit"
-    >提交</x-button>
+      >提交</x-button
+    >
     <toast v-model="toast.show">{{ toast.msg }}</toast>
   </div>
 </template>
@@ -61,6 +51,8 @@ import util from "../lib/common";
 import * as db from "../lib/db";
 let questionList = util.getHarmoney(questionJSON);
 
+let filterQuestions = [0, 1, 2, 3, 4, 9, 13, 14, 28];
+
 export default {
   name: "page",
   components: {
@@ -71,19 +63,19 @@ export default {
     XButton,
     Tips,
     Rater,
-    XTextarea
+    XTextarea,
   },
   data() {
     return {
       toast: {
         show: false,
-        msg: ""
+        msg: "",
       },
       answerList: [],
       isCompleted: false,
       startTime: dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss"),
       raterText: ["很不满意", "不太满意", "一般", "满意", "非常满意"],
-      questionList
+      questionList,
     };
   },
   computed: {
@@ -94,7 +86,7 @@ export default {
       },
       set(val) {
         this.$store.commit("setSport", val);
-      }
+      },
     },
     url() {
       return window.location.href.split("#")[0];
@@ -105,49 +97,62 @@ export default {
       },
       set(val) {
         this.$store.commit("setTips", val);
-      }
+      },
     },
     score_dept() {
-      let score = 0;
-      for (let i = 10; i < this.questionList.length - 2; i++) {
-        let curQuestion = this.answerList[i] || 0;
-        if (this.questionList[i].option) {
-          curQuestion = 0;
-        }
-        score += curQuestion;
-      }
-      return score;
+      return 0;
+      // let score = 0;
+      // for (let i = 10; i < this.questionList.length - 2; i++) {
+      //   let curQuestion = this.answerList[i] || 0;
+      //   if (this.questionList[i].option) {
+      //     curQuestion = 0;
+      //   }
+      //   score += curQuestion;
+      // }
+      // return score;
     },
     score_company() {
       let score = 0;
-      [3, 4, 5, 6, 9].forEach(i => {
-        let curQuestion = this.answerList[i] || 0;
-        if (this.questionList[i].option) {
-          curQuestion = 0;
+      this.answerList.forEach((item, i) => {
+        if (filterQuestions.includes(i)) {
+          return;
         }
+        let curQuestion = item || 0;
         score += curQuestion;
       });
       return score;
+
+      // [3, 4, 5, 6, 9].forEach((i) => {
+      //   let curQuestion = this.answerList[i] || 0;
+      //   if (this.questionList[i].option) {
+      //     curQuestion = 0;
+      //   }
+      //   score += curQuestion;
+      // });
+      // return score;
     },
     // 对公司的建议
     suggest_company() {
-      return this.answerList[32] || "";
+      return this.answerList[13] || "";
     },
     // 对部门的建议
     suggest_dept() {
-      return this.answerList[33] || "";
-    }
+      return this.answerList[28] || "";
+    },
   },
   watch: {
     answerList(val) {
       this.getCompleteStatus();
-    }
+    },
   },
   methods: {
     getCompleteStatus() {
       let flag = true;
       // 最后2题不计是否答完
-      for (let i = 0; flag && i < this.questionList.length - 2; i++) {
+      for (let i = 0; flag && i < this.questionList.length; i++) {
+        if (i == 13 || i == 28) {
+          break;
+        }
         let item = this.answerList[i];
         if (typeof item == "undefined") {
           flag = false;
@@ -156,12 +161,26 @@ export default {
       this.isCompleted = flag;
     },
     getSubmitData() {
-      let arr = ["A", "B", "C", "D", "E"];
+      let arr = [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M",
+      ];
       let answer = this.answerList
-        .slice(0, this.answerList.length - 2)
         .map((item, i) =>
           this.questionList[i].option ? arr[item] : arr[item - 1]
         )
+        .filter((item, i) => ![13, 28].includes(i))
         .join(",");
       this.sport.curScore = this.score_dept + this.score_company;
 
@@ -173,13 +192,14 @@ export default {
         suggest_company: this.suggest_company,
         suggest_dept: this.suggest_dept,
         uid: this.sport.uid,
-        answer
+        answer,
       };
     },
     async submit() {
       let params = this.getSubmitData();
+
       let { data } = await db.addCbpcHarmoney(params);
-      console.log(params);
+
       if (data[0].id > 0) {
         this.toast.show = true;
         this.toast.msg = "提交成功";
@@ -193,11 +213,11 @@ export default {
       if (this.sport.uid == 0) {
         this.$router.push("/login");
       }
-    }
+    },
   },
   mounted() {
     this.prepareData();
-  }
+  },
 };
 </script>
 <style scoped lang="less">

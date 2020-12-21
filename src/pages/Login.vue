@@ -9,12 +9,12 @@
         placeholder="点击此处输入姓名"
       ></x-input>
       <x-input
-        title="密码"
+        title="卡号"
         required
         :max="6"
         name="cardNo"
         v-model="sport.cardNo"
-        placeholder="点击此处输入身份证后6位"
+        placeholder="点击此处输入工作牌号"
       ></x-input>
       <template v-if="sport.useDept">
         <x-input
@@ -24,17 +24,15 @@
           name="dpt"
           v-model="sport.dpt[0]"
         ></x-input>
-        <picker
-          :data='dptList'
-          v-model='sport.dpt'
-        ></picker>
+        <picker :data="dptList" v-model="sport.dpt"></picker>
       </template>
       <div class="btn">
         <x-button
-          :disabled="!shouldCommit||isEnd"
+          :disabled="!shouldCommit || isEnd"
           type="primary"
           @click.native="submit"
-        >{{isEnd ? "活动已结束" : "登录"}}</x-button>
+          >{{ isEnd ? "活动已结束" : "登录" }}</x-button
+        >
       </div>
     </group>
     <toast v-model="toast.show">{{ toast.msg }}</toast>
@@ -49,7 +47,7 @@ import {
   Toast,
   Picker,
   GroupTitle,
-  dateFormat
+  dateFormat,
 } from "vux";
 
 import { mapState } from "vuex";
@@ -63,15 +61,15 @@ export default {
     Group,
     Toast,
     GroupTitle,
-    Picker
+    Picker,
   },
   data() {
     return {
       toast: {
         show: false,
-        msg: ""
+        msg: "",
       },
-      dptList: []
+      dptList: [],
     };
   },
   computed: {
@@ -89,13 +87,13 @@ export default {
       },
       set(val) {
         this.$store.commit("setSport", val);
-      }
+      },
     },
     isEnd() {
       return (
-        dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss") > "2018-12-21 23:59:59"
+        dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss") > "2020-12-25 23:59:59"
       );
-    }
+    },
   },
   methods: {
     jump(router) {
@@ -107,7 +105,7 @@ export default {
       this.loadUserInfo();
     },
     loadUserInfo() {
-      let userInfo = localStorage.getItem("userInfoHarmoney");
+      let userInfo = localStorage.getItem("userInfoHarmoney2020");
       if (userInfo == null) {
         return;
       }
@@ -116,14 +114,14 @@ export default {
       this.sport = {
         userName: userInfo.username,
         cardNo: userInfo.psw,
-        dpt: [userInfo.dept]
+        dpt: [userInfo.dept],
       };
     },
-    submit: async function() {
+    submit: async function () {
       let { data, rows } = await db.getCbpcHarmoneyUserlist({
         dept: this.sport.dpt[0],
         username: this.sport.userName,
-        id_card: this.sport.cardNo.toUpperCase()
+        id_card: this.sport.cardNo.toUpperCase(),
       });
 
       // 卡号或部门输入错误
@@ -149,20 +147,20 @@ export default {
         username: this.sport.userName,
         psw: this.sport.cardNo,
         dept: this.sport.dpt[0],
-        uid
+        uid,
       };
 
       var userInfo = JSON.stringify(params);
       this.sport.uid = uid;
       // this.sport.curScore = obj.score;
-      localStorage.setItem("userInfoHarmoney", userInfo);
+      localStorage.setItem("userInfoHarmoney2020", userInfo);
       this.jump("paper");
-    }
+    },
   },
   mounted() {
     document.title = "登录";
     this.init();
-  }
+  },
 };
 </script>
 <style lang="less" scoped>

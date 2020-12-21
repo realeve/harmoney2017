@@ -1,18 +1,20 @@
 <template>
   <div class="wrapper">
     <div class="content">
-      <p class="title margin-top-20">2018年度公司和谐企业创建<br>员工满意度测评问卷</p>
-      <p class="margin-top-20 tips">截止至 {{now}} ,本次活动共有{{this.papers.length}}人参与测评，统计结果如下：</p>
-      <div
-        class="card"
-        v-for="(item,i) of chartData"
-        :key="i"
-      >
+      <p class="title margin-top-20">
+        2020年度公司和谐企业创建<br />员工满意度测评问卷
+      </p>
+      <p class="margin-top-20 tips">
+        截止至 {{ now }} ,本次活动共有{{
+          this.papers.length
+        }}人参与测评，统计结果如下：
+      </p>
+      <div class="card" v-for="(item, i) of chartData" :key="i">
         <div class="content">
-          <div>{{i+1}}.{{item.title}}</div>
+          <div>{{ i + 1 }}.{{ item.title }}</div>
           <v-chart
             :data="item.data"
-            :height="(i==0?800:250)+'px'"
+            :height="(i == 0 ? 800 : 250) + 'px'"
           ></v-chart>
         </div>
       </div>
@@ -29,13 +31,13 @@ import * as db from "../lib/db";
 
 export default {
   components: {
-    VChart
+    VChart,
   },
   data() {
     return {
       papers: [],
       depts: [],
-      now: dateFormat(new Date(), "YYYY-MM-DD HH:mm")
+      now: dateFormat(new Date(), "YYYY-MM-DD HH:mm"),
     };
   },
   computed: {
@@ -46,68 +48,68 @@ export default {
       },
       set(val) {
         this.$store.commit("setSport", val);
-      }
+      },
     },
     chartData() {
       let data = [
         {
           title: "各部门参与比例如下:",
-          data: this.depts
+          data: this.depts,
         },
-        {
-          title: "性别构成：",
-          data: [
-            {
-              name: "男",
-              value: 0
-            },
-            {
-              name: "女",
-              value: 0
-            }
-          ]
-        },
-        {
-          title: "年龄构成：",
-          data: [
-            {
-              name: "30岁以下",
-              value: 0
-            },
-            {
-              name: "30-35岁",
-              value: 0
-            },
-            {
-              name: "36-40岁",
-              value: 0
-            },
-            {
-              name: "41-50岁",
-              value: 0
-            },
-            {
-              name: "50岁以上",
-              value: 0
-            }
-          ]
-        }
+        // {
+        //   title: "性别构成：",
+        //   data: [
+        //     {
+        //       name: "男",
+        //       value: 0,
+        //     },
+        //     {
+        //       name: "女",
+        //       value: 0,
+        //     },
+        //   ],
+        // },
+        // {
+        //   title: "年龄构成：",
+        //   data: [
+        //     {
+        //       name: "30岁以下",
+        //       value: 0,
+        //     },
+        //     {
+        //       name: "30-35岁",
+        //       value: 0,
+        //     },
+        //     {
+        //       name: "36-40岁",
+        //       value: 0,
+        //     },
+        //     {
+        //       name: "41-50岁",
+        //       value: 0,
+        //     },
+        //     {
+        //       name: "50岁以上",
+        //       value: 0,
+        //     },
+        //   ],
+        // },
       ];
 
-      questionJSON.slice(0, questionJSON.length - 2).forEach(item => {
+      questionJSON.slice(0, questionJSON.length - 2).forEach((item) => {
         item.option = item.option || [
           "很不满意",
           "不太满意",
           "一般",
           "满意",
-          "非常满意"
+          "非常满意",
         ];
         let obj = {
           title: item.title,
-          data: item.option.map(name => ({
+          data: item.option.map((name) => ({
             name,
-            value: 0
-          }))
+            value: 0,
+          })),
         };
         data.push(obj);
       });
@@ -146,11 +148,11 @@ export default {
       });
 
       return data;
-    }
+    },
   },
   methods: {
     async loadPapers() {
-      this.papers = await db.getCbpcHarmoney().then(res => res.data);
+      this.papers = await db.getCbpcHarmoney().then((res) => res.data);
       // 各部门参与情况
       this.depts = await db.getCbpcHarmoneyDept().then(({ data }) =>
         data.map((item, i) => {
@@ -177,12 +179,12 @@ export default {
           return item;
         })
       );
-    }
+    },
   },
   mounted() {
-    document.title = "2018年度和谐企业创建";
+    document.title = "2020年度和谐企业创建";
     this.loadPapers();
-  }
+  },
 };
 </script>
 <style lang="less" scoped>

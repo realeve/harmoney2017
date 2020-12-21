@@ -55,7 +55,7 @@ function randomAnswer(questions) {
     newAnswer.sort((a, b) => a - b);
     Object.assign(question, {
       option: newQuestions,
-      answer: newAnswer
+      answer: newAnswer,
     });
     return question;
   });
@@ -65,16 +65,16 @@ function getPaperData(json) {
   let questions = randomArr(json);
   let randomQuestions = randomAnswer(questions);
 
-  var alphaArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+  var alphaArr = ["A", "B", "C", "D", "E", "F", "G"];
 
-  if (typeof randomQuestions[0].option[0] != 'string') {
+  if (typeof randomQuestions[0].option[0] != "string") {
     return randomQuestions;
   }
   return randomQuestions.map((item) => {
     item.option = item.option.map((value, key) => {
       return {
         key,
-        value: alphaArr[key] + '、' + value
+        value: alphaArr[key] + "、" + value,
       };
     });
     return item;
@@ -82,9 +82,9 @@ function getPaperData(json) {
 }
 
 function getHarmoney(randomQuestions) {
-  var alphaArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+  var alphaArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
 
-  if (typeof randomQuestions[0].option[0] != 'string') {
+  if (typeof randomQuestions[0].option[0] != "string") {
     return randomQuestions;
   }
 
@@ -95,7 +95,7 @@ function getHarmoney(randomQuestions) {
     item.option = item.option.map((value, key) => {
       return {
         key,
-        value: alphaArr[key] + '、' + value
+        value: alphaArr[key] + "、" + value,
       };
     });
     return item;
@@ -107,5 +107,5 @@ export default {
   randomArr,
   randomAnswer,
   getPaperData,
-  getHarmoney
+  getHarmoney,
 };
