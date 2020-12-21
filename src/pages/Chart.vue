@@ -96,53 +96,53 @@ export default {
         // },
       ];
 
-      questionJSON.slice(0, questionJSON.length - 2).forEach((item) => {
-        item.option = item.option || [
-          "很不满意",
-          "不太满意",
-          "一般",
-          "满意",
-          "非常满意",
-        ];
-        let obj = {
-          title: item.title,
-          data: item.option.map((name) => ({
-            name,
-            value: 0,
-          })),
-        };
-        data.push(obj);
-      });
-
+      questionJSON
+        .filter((item, i) => ![13, 28].includes(i))
+        .forEach((item) => {
+          item.option = item.option || [
+            "很不满意",
+            "不太满意",
+            "一般",
+            "满意",
+            "非常满意",
+          ];
+          let obj = {
+            title: item.title,
+            data: item.option.map((name) => ({
+              name,
+              value: 0,
+            })),
+          };
+          data.push(obj);
+        });
       this.papers.map((item, i) => {
-        // 性别
-        if (item.sex == "男") {
-          data[1].data[0].value++;
-        } else {
-          data[1].data[1].value++;
-        }
+        // // 性别
+        // if (item.sex == "男") {
+        //   data[1].data[0].value++;
+        // } else {
+        //   data[1].data[1].value++;
+        // }
 
-        // 年龄
-        const age = parseInt(item.age);
-        if (age < 30) {
-          data[2].data[0].value++;
-        } else if (age < 35) {
-          data[2].data[1].value++;
-        } else if (age < 40) {
-          data[2].data[2].value++;
-        } else if (age < 50) {
-          data[2].data[3].value++;
-        } else {
-          data[2].data[4].value++;
-        }
-
+        // // 年龄
+        // const age = parseInt(item.age);
+        // if (age < 30) {
+        //   data[2].data[0].value++;
+        // } else if (age < 35) {
+        //   data[2].data[1].value++;
+        // } else if (age < 40) {
+        //   data[2].data[2].value++;
+        // } else if (age < 50) {
+        //   data[2].data[3].value++;
+        // } else {
+        //   data[2].data[4].value++;
+        // }
         // 其它数据
         const answers = item.answer.split(",");
         answers.forEach((answer, idx) => {
           let code = answer.charCodeAt() - 65;
           // 选项记数
-          if (typeof data[idx + 3].data[code] != "undefined") {
-            data[idx + 3].data[code].value++;
+          if (typeof data[idx + 1].data[code] != "undefined") {
+            data[idx + 1].data[code].value++;
           }
         });
       });
@@ -159,22 +159,22 @@ export default {
           if (item.name.indexOf("（") > -1) {
             item.name = item.name.split("（")[0];
           }
-          if (item.name.includes("公司")) {
-            switch (item.name) {
-              case "中钞金服科技有限公司":
-                item.name = "中钞金服";
-                break;
-              case "中钞长城贵金属有限公司":
-                item.name = "长城公司";
-                break;
-              case "成都金鼎安全印制有限责任公司":
-                item.name = "金鼎公司";
-                break;
-              case "成钞物业管理有限公司":
-                item.name = "物业公司";
-                break;
-            }
-          }
+          // if (item.name.includes("公司")) {
+          //   switch (item.name) {
+          //     case "中钞金服科技有限公司":
+          //       item.name = "中钞金服";
+          //       break;
+          //     case "中钞长城贵金属有限公司":
+          //       item.name = "长城公司";
+          //       break;
+          //     case "成都金鼎安全印制有限责任公司":
+          //       item.name = "金鼎公司";
+          //       break;
+          //     case "成钞物业管理有限公司":
+          //       item.name = "物业公司";
+          //       break;
+          //   }
+          // }
           item.name = `${data.length - i}.${item.name}`;
           return item;
         })
