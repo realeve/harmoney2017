@@ -2,7 +2,7 @@
   <div class="wrapper">
     <div class="content">
       <p class="title margin-top-20">
-        2020年度公司和谐企业创建<br />员工满意度测评问卷
+        2020年度公司文明单位创建<br />员工满意度测评问卷
       </p>
       <p class="margin-top-20 tips">
         截止至 {{ now }} ,本次活动共有{{
@@ -182,7 +182,7 @@ export default {
     },
   },
   mounted() {
-    document.title = "2020年度和谐企业创建";
+    document.title = "2020年度文明单位创建";
     this.loadPapers();
   },
 };

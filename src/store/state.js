@@ -22,9 +22,9 @@ const state = {
   tips: "",
   sport: {
     id: 1,
-    name: "2020年度和谐企业创建",
+    name: "2020年度文明单位创建",
     orgname: "", // 机构名
-    slogan: "2020年度和谐企业创建", // 口号
+    slogan: "2020年度文明单位创建", // 口号
     timeRange: "12月", // 活动时间
     questionNums: 25, // 抽题数量
     useDept: true,

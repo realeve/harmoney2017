@@ -25,10 +25,9 @@ export const getCbpcHarmoneyUserlistDepts = () =>
   axios({
     url: "/242/6a4d61905e/10.array",
     // url: "/115/5e946191de/10.array",
-  }).then((res) => {
-    let data = res.data.map((item) => item[1]);
-    return { ...res, data };
-  });
+  }).then((res) =>
+    res.data.map((item) => item[1]).filter((item) => item !== "董事会、经理部")
+  );
 
 /**
 *   @database: { 微信开发 }

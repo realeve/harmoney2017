@@ -100,7 +100,7 @@ export default {
       this.$router.push(router);
     },
     async init() {
-      let { data: depts } = await db.getCbpcHarmoneyUserlistDepts();
+      let depts = await db.getCbpcHarmoneyUserlistDepts();
       this.dptList = [R.flatten(depts)];
       this.loadUserInfo();
     },
