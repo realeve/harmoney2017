@@ -108,7 +108,7 @@ export default {
           title: this.title, // 分享标题
           desc: this.title,
           link: this.shareUrl,
-          imgUrl: "http://cbpm.sinaapp.com/cdn/logo/cbpc.jpg",
+          imgUrl: "http://www.cbpc.ltd/cdn/cbpc.jpg",
           type: "",
           dataUrl: "",
           success: function () {},
