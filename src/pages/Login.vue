@@ -91,7 +91,7 @@ export default {
     },
     isEnd() {
       return (
-        dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss") > "2020-12-25 23:59:59"
+        dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss") > "2021-8-25 23:59:59"
       );
     },
   },
