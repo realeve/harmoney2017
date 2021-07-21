@@ -74,7 +74,7 @@ export default {
       if (!val) {
         return;
       }
-      this.title = `成都印钞有限公司2020年度文明单位创建正在进行中...`;
+      this.title = `成都印钞有限公司2021年度成本月活动正在进行中...`;
       this.initWxShare();
     },
   },

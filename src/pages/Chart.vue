@@ -1,7 +1,9 @@
 <template>
   <div class="wrapper">
     <div class="content">
-      <p class="title margin-top-20">2021年成本月活动调查问卷</p>
+      <p class="title margin-top-20">
+        2021年度公司成本月活动<br />2021年成本月活动调查问卷
+      </p>
       <p class="margin-top-20 tips">
         截止至 {{ now }} ,本次活动共有{{
           this.papers.length
