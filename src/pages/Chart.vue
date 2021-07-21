@@ -1,9 +1,7 @@
 <template>
   <div class="wrapper">
     <div class="content">
-      <p class="title margin-top-20">
-        2020年度公司文明单位创建<br />员工满意度测评问卷
-      </p>
+      <p class="title margin-top-20">2021年成本月活动调查问卷</p>
       <p class="margin-top-20 tips">
         截止至 {{ now }} ,本次活动共有{{
           this.papers.length
@@ -25,7 +23,7 @@
 <script>
 import { mapState } from "vuex";
 import { dateFormat } from "vux";
-import questionJSON from "../assets/data/harmoney";
+import questionJSON from "../assets/data/costPaper2021";
 import VChart from "../components/Chart";
 import * as db from "../lib/db";
 
@@ -97,7 +95,7 @@ export default {
       ];
 
       questionJSON
-        .filter((item, i) => ![13, 28].includes(i))
+        .filter((item, i) => ![15, 16, 17].includes(i))
         .forEach((item) => {
           item.option = item.option || [
             "很不满意",
@@ -115,6 +113,7 @@ export default {
           };
           data.push(obj);
         });
+
       this.papers.map((item, i) => {
         // // 性别
         // if (item.sex == "男") {
@@ -122,7 +121,6 @@ export default {
         // } else {
         //   data[1].data[1].value++;
         // }
-
         // // 年龄
         // const age = parseInt(item.age);
         // if (age < 30) {
@@ -138,15 +136,28 @@ export default {
         // }
         // 其它数据
         const answers = item.answer.split(",");
+
         answers.forEach((answer, idx) => {
-          let code = answer.charCodeAt() - 65;
-          // 选项记数
-          if (typeof data[idx + 1].data[code] != "undefined") {
-            data[idx + 1].data[code].value++;
+          if (answer.length == 1) {
+            let code = answer.charCodeAt() - 65;
+            // 选项记数
+            if (typeof data[idx + 1].data[code] != "undefined") {
+              data[idx + 1].data[code].value++;
+            }
+          }
+          if (answer.length > 1) {
+            let multi_answers = answer.split("-");
+            multi_answers.forEach((multi_answer, index) => {
+              let code = multi_answer.charCodeAt() - 65;
+              // 选项记数
+              if (typeof data[idx + 1].data[code] != "undefined") {
+                data[idx + 1].data[code].value++;
+              }
+            });
           }
         });
       });
-
+      console.log(data);
       return data;
     },
   },
@@ -182,7 +193,7 @@ export default {
     },
   },
   mounted() {
-    document.title = "2020年度文明单位创建";
+    document.title = "2021年成本月活动调查问卷";
     this.loadPapers();
   },
 };

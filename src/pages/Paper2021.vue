@@ -6,14 +6,24 @@
       >
       <div class="section-item">
         <group v-if="question.option" :title="`${i + 1}.${question.title}`">
-          <radio :options="question.option" v-model="answerList[i]"></radio>
+          <template v-if="question.type === 'single'">
+            <radio :options="question.option" v-model="answerList[i]"></radio>
+          </template>
+          <template v-if="question.type === 'multi'">
+            <checklist
+              label-position="left"
+              :options="question.option"
+              v-model="answerList[i]"
+            ></checklist>
+          </template>
+          <template v-if="question.type === 'next'">
+            <radio :options="question.option" v-model="answerList[i]"></radio>
+          </template>
         </group>
+
         <div v-else>
           <div class="weui-cells__title">{{ i + 1 }}.{{ question.title }}</div>
-          <div
-            v-if="question.title.indexOf('建议') == -1"
-            class="rater-container"
-          >
+          <div v-if="i > 17" class="rater-container">
             <rater :min="1" :max="5" v-model="answerList[i]" />
             <label class="text">{{ raterText[answerList[i] - 1] }}</label>
           </div>
@@ -44,7 +54,7 @@ import { dateFormat } from "vux";
 
 import { mapState } from "vuex";
 
-import questionJSON from "../assets/data/harmoney";
+import questionJSON from "../assets/data/costPaper2021";
 
 import Tips from "../components/Tips.vue";
 import util from "../lib/common";
@@ -148,11 +158,11 @@ export default {
   methods: {
     getCompleteStatus() {
       let flag = true;
-      // 最后2题不计是否答完
+      // 必须全部作答
       for (let i = 0; flag && i < this.questionList.length; i++) {
-        if (i == 13 || i == 28) {
-          break;
-        }
+        // if (i == 13 || i == 28) {
+        //   break;
+        // }
         let item = this.answerList[i];
         if (typeof item == "undefined") {
           flag = false;
@@ -176,19 +186,30 @@ export default {
         "L",
         "M",
       ];
+
       let answer = this.answerList
-        .map((item, i) =>
-          this.questionList[i].option ? arr[item] : arr[item - 1]
-        )
-        .filter((item, i) => ![13, 28].includes(i))
+        .map((item, i) => {
+          if (this.questionList[i].type === "single") {
+            return arr[item];
+          }
+          if (this.questionList[i].type === "multi") {
+            return item.map((item_inner) => arr[item_inner]).join("-");
+          }
+          if (this.questionList[i].type === "next") {
+            return null;
+          }
+          if (this.questionList[i].type === "text") {
+            return null;
+          }
+        })
         .join(",");
       this.sport.curScore = this.score_dept + this.score_company;
 
       return {
         start_time: this.startTime,
         rec_time: dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss"),
-        score_dept: this.score_dept,
-        score_company: this.score_company,
+        score_dept: 0,
+        score_company: 0,
         suggest_company: this.suggest_company,
         suggest_dept: this.suggest_dept,
         uid: this.sport.uid,
@@ -197,7 +218,7 @@ export default {
     },
     async submit() {
       let params = this.getSubmitData();
-
+      console.log(params);
       let { data } = await db.addCbpcHarmoney(params);
 
       if (data[0].id > 0) {
