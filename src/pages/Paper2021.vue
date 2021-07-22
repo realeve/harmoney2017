@@ -18,6 +18,13 @@
           </template>
           <template v-if="question.type === 'next'">
             <radio :options="question.option" v-model="answerList[i]"></radio>
+            <group v-show="answerList[i] == ['1']" :title="`${question.title_next}`">
+              <checklist
+                label-position="left"
+                :options="question.option_next"
+                v-model="answerList[i + 1]"
+              ></checklist>
+            </group>
           </template>
         </group>
 
