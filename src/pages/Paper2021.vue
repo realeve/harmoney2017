@@ -18,11 +18,14 @@
           </template>
           <template v-if="question.type === 'next'">
             <radio :options="question.option" v-model="answerList[i]"></radio>
-            <group v-show="answerList[i] == ['1']" :title="`${question.title_next}`">
+            <group
+              v-show="answerList[i] == ['1']"
+              :title="`${question.title_next}`"
+            >
               <checklist
                 label-position="left"
                 :options="question.option_next"
-                v-model="answerList[i + 1]"
+                v-model="answerList[i + 3]"
               ></checklist>
             </group>
           </template>
@@ -177,6 +180,7 @@ export default {
       }
       this.isCompleted = flag;
     },
+
     getSubmitData() {
       let arr = [
         "A",
@@ -193,25 +197,32 @@ export default {
         "L",
         "M",
       ];
-
+      console.log("answerList", this.answerList);
       let answer = this.answerList
         .map((item, i) => {
-          if (this.questionList[i].type === "single") {
-            return arr[item];
-          }
-          if (this.questionList[i].type === "multi") {
-            return item.map((item_inner) => arr[item_inner]).join("-");
-          }
-          if (this.questionList[i].type === "next") {
-            return null;
-          }
-          if (this.questionList[i].type === "text") {
-            return null;
+          if (i < 18) {
+            if (this.questionList[i].type === "single") {
+              return arr[item];
+            }
+            if (this.questionList[i].type === "multi") {
+              return item.map((item_inner) => arr[item_inner]).join("-");
+            }
+            if (this.questionList[i].type === "next") {
+              return arr[item];
+            }
+            if (this.questionList[i].type === "text") {
+              return null;
+            }
+          } else {
+            return item
+              .map(
+                (item_inner) => arr[parseInt(item_inner.substring(0, 1)) - 1]
+              )
+              .join("-");
           }
         })
         .join(",");
       this.sport.curScore = this.score_dept + this.score_company;
-
       return {
         start_time: this.startTime,
         rec_time: dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss"),
@@ -225,7 +236,7 @@ export default {
     },
     async submit() {
       let params = this.getSubmitData();
-      console.log(params);
+      console.log("getSubmitData", params);
       let { data } = await db.addCbpcHarmoney(params);
 
       if (data[0].id > 0) {

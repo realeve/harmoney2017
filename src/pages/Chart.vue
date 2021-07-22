@@ -25,7 +25,8 @@
 <script>
 import { mapState } from "vuex";
 import { dateFormat } from "vux";
-import questionJSON from "../assets/data/costPaper2021";
+import _ from "lodash";
+import questionsJSON from "../assets/data/costPaper2021";
 import VChart from "../components/Chart";
 import * as db from "../lib/db";
 
@@ -96,9 +97,10 @@ export default {
         // },
       ];
 
-      questionJSON
-        .filter((item, i) => ![15, 16, 17].includes(i))
-        .forEach((item) => {
+      let questions = _.cloneDeep(questionsJSON);
+      questions
+        .filter((item, i) => ![16, 17].includes(i))
+        .forEach((item, i) => {
           item.option = item.option || [
             "很不满意",
             "不太满意",
@@ -109,12 +111,21 @@ export default {
           let obj = {
             title: item.title,
             data: item.option.map((name) => ({
-              name,
+              name: name,
               value: 0,
             })),
           };
           data.push(obj);
         });
+
+      let obj_next = {
+        title: questions[15].title_next,
+        data: questions[15].option_next.map((name) => ({
+          name: name.substring(2),
+          value: 0,
+        })),
+      };
+      data.push(obj_next);
 
       this.papers.map((item, i) => {
         // // 性别
@@ -138,28 +149,44 @@ export default {
         // }
         // 其它数据
         const answers = item.answer.split(",");
-
+        console.log("answers", answers);
         answers.forEach((answer, idx) => {
           if (answer.length == 1) {
             let code = answer.charCodeAt() - 65;
-            // 选项记数
-            if (typeof data[idx + 1].data[code] != "undefined") {
-              data[idx + 1].data[code].value++;
+            if (answers.length == 19 && idx == 18) {
+              // 两步选项题型_选项记数
+              if (typeof data[17].data[code] != "undefined") {
+                data[17].data[code].value++;
+              }
+            } else {
+              // 选项记数
+              if (typeof data[idx + 1].data[code] != "undefined") {
+                data[idx + 1].data[code].value++;
+              }
             }
           }
           if (answer.length > 1) {
             let multi_answers = answer.split("-");
             multi_answers.forEach((multi_answer, index) => {
               let code = multi_answer.charCodeAt() - 65;
-              // 选项记数
-              if (typeof data[idx + 1].data[code] != "undefined") {
-                data[idx + 1].data[code].value++;
+              if (answers.length == 19 && idx == 18) {
+                // 两步选项题型_选项记数
+                if (typeof data[17].data[code] != "undefined") {
+                  data[17].data[code].value++;
+                }
+              } else {
+                // 选项记数
+                if (typeof data[idx + 1].data[code] != "undefined") {
+                  data[idx + 1].data[code].value++;
+                }
               }
             });
           }
         });
       });
-      console.log(data);
+      console.log("data", data);
+      console.log("data.length", data.length);
+
       return data;
     },
   },
