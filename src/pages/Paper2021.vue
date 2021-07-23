@@ -197,7 +197,7 @@ export default {
         "L",
         "M",
       ];
-      console.log("answerList", this.answerList);
+      //console.log("answerList", this.answerList);
       let answer = this.answerList
         .map((item, i) => {
           if (i < 18) {
@@ -236,7 +236,7 @@ export default {
     },
     async submit() {
       let params = this.getSubmitData();
-      console.log("getSubmitData", params);
+      //console.log("getSubmitData", params);
       let { data } = await db.addCbpcHarmoney(params);
 
       if (data[0].id > 0) {
@@ -246,7 +246,6 @@ export default {
         this.$router.push("info");
       }
     },
-
     prepareData() {
       document.title = this.sport.name + "微信答题活动";
       if (this.sport.uid == 0) {

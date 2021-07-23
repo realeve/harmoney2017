@@ -25,11 +25,9 @@
 <script>
 import { mapState } from "vuex";
 import { dateFormat } from "vux";
-import _ from "lodash";
 import questionsJSON from "../assets/data/costPaper2021";
 import VChart from "../components/Chart";
 import * as db from "../lib/db";
-
 export default {
   components: {
     VChart,
@@ -97,8 +95,7 @@ export default {
         // },
       ];
 
-      let questions = _.cloneDeep(questionsJSON);
-      questions
+      questionsJSON
         .filter((item, i) => ![16, 17].includes(i))
         .forEach((item, i) => {
           item.option = item.option || [
@@ -119,8 +116,8 @@ export default {
         });
 
       let obj_next = {
-        title: questions[15].title_next,
-        data: questions[15].option_next.map((name) => ({
+        title: questionsJSON[15].title_next,
+        data: questionsJSON[15].option_next.map((name) => ({
           name: name.substring(2),
           value: 0,
         })),
@@ -149,7 +146,7 @@ export default {
         // }
         // 其它数据
         const answers = item.answer.split(",");
-        console.log("answers", answers);
+        //console.log("answers", answers);
         answers.forEach((answer, idx) => {
           if (answer.length == 1) {
             let code = answer.charCodeAt() - 65;
@@ -184,9 +181,7 @@ export default {
           }
         });
       });
-      console.log("data", data);
-      console.log("data.length", data.length);
-
+      //console.log("data", data);
       return data;
     },
   },

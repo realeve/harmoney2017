@@ -1,3 +1,4 @@
+import _ from "lodash";
 function randomsort(a, b) {
   return Math.random() > 0.5 ? -1 : 1;
 }
@@ -81,7 +82,8 @@ function getPaperData(json) {
   });
 }
 
-function getHarmoney(randomQuestions) {
+function getHarmoney(res) {
+  let randomQuestions = _.cloneDeep(res);
   var alphaArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
 
   if (typeof randomQuestions[0].option[0] != "string") {
