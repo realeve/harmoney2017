@@ -22,9 +22,9 @@ const state = {
   tips: "",
   sport: {
     id: 1,
-    name: "2021年度公司成本月活动",
+    name: "2021年度公司廉政月活动",
     orgname: "", // 机构名
-    slogan: "2021年成本月活动调查问卷", // 口号
+    slogan: "2021年廉政月活动调查问卷", // 口号
     timeRange: "12月", // 活动时间
     questionNums: 25, // 抽题数量
     useDept: true,

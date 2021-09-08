@@ -2,7 +2,7 @@
   <div class="wrapper">
     <div class="content">
       <p class="title margin-top-20">
-        2021年度公司成本月活动<br />2021年成本月活动调查问卷
+        2021年度公司成本月活动<br />2021年廉政月活动调查问卷
       </p>
       <p class="margin-top-20 tips">
         截止至 {{ now }} ,本次活动共有{{
@@ -11,7 +11,7 @@
       </p>
       <div class="card" v-for="(item, i) of chartData" :key="i">
         <div class="content">
-          <div>{{ i + 1 }}.{{ item.title }}</div>
+          <div>{{ i }}.{{ item.title }}</div>
           <v-chart
             :data="item.data"
             :height="(i == 0 ? 800 : 250) + 'px'"
@@ -25,7 +25,8 @@
 <script>
 import { mapState } from "vuex";
 import { dateFormat } from "vux";
-import questionsJSON from "../assets/data/costPaper2021";
+// import questionsJSON from "../assets/data/costPaper2021";
+import questionsJSON from "../assets/data/incorruptPaper2021";
 import VChart from "../components/Chart";
 import * as db from "../lib/db";
 export default {
@@ -94,10 +95,11 @@ export default {
         //   ],
         // },
       ];
-
       questionsJSON
-        .filter((item, i) => ![16, 17].includes(i))
+        // .filter((item, i) => ![16, 17].includes(i))
+         .filter((item, i) => ![25].includes(i))
         .forEach((item, i) => {
+          console.log(item, i)
           item.option = item.option || [
             "很不满意",
             "不太满意",
@@ -114,10 +116,9 @@ export default {
           };
           data.push(obj);
         });
-
       let obj_next = {
-        title: questionsJSON[15].title_next,
-        data: questionsJSON[15].option_next.map((name) => ({
+        title: questionsJSON[24].title,
+        data: questionsJSON[24].option.map((name) => ({
           name: name.substring(2),
           value: 0,
         })),
@@ -150,10 +151,10 @@ export default {
         answers.forEach((answer, idx) => {
           if (answer.length == 1) {
             let code = answer.charCodeAt() - 65;
-            if (answers.length == 19 && idx == 18) {
+            if (answers.length == 26 && idx == 25) {
               // 两步选项题型_选项记数
-              if (typeof data[17].data[code] != "undefined") {
-                data[17].data[code].value++;
+              if (typeof data[24].data[code] != "undefined") {
+                data[24].data[code].value++;
               }
             } else {
               // 选项记数
@@ -166,10 +167,10 @@ export default {
             let multi_answers = answer.split("-");
             multi_answers.forEach((multi_answer, index) => {
               let code = multi_answer.charCodeAt() - 65;
-              if (answers.length == 19 && idx == 18) {
+              if (answers.length == 26 && idx == 25) {
                 // 两步选项题型_选项记数
-                if (typeof data[17].data[code] != "undefined") {
-                  data[17].data[code].value++;
+                if (typeof data[24].data[code] != "undefined") {
+                  data[24].data[code].value++;
                 }
               } else {
                 // 选项记数
@@ -217,7 +218,7 @@ export default {
     },
   },
   mounted() {
-    document.title = "2021年成本月活动调查问卷";
+    document.title = "2021年廉政月活动调查问卷";
     this.loadPapers();
   },
 };

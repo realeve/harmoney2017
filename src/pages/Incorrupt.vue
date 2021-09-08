@@ -9,13 +9,6 @@
           <template v-if="question.type === 'single'">
             <radio :options="question.option" v-model="answerList[i]"></radio>
           </template>
-          <template v-if="question.type === 'multi'">
-            <checklist
-              label-position="left"
-              :options="question.option"
-              v-model="answerList[i]"
-            ></checklist>
-          </template>
           <template v-if="question.type === 'next'">
             <radio :options="question.option" v-model="answerList[i]"></radio>
             <group
@@ -33,7 +26,7 @@
 
         <div v-else>
           <div class="weui-cells__title">{{ i + 1 }}.{{ question.title }}</div>
-          <div v-if="i > 17" class="rater-container">
+          <div v-if="i > 25" class="rater-container">
             <rater :min="1" :max="5" v-model="answerList[i]" />
             <label class="text">{{ raterText[answerList[i] - 1] }}</label>
           </div>
@@ -63,8 +56,8 @@ import { Toast, XTextarea, Group, Radio, Checklist, XButton, Rater } from "vux";
 import { dateFormat } from "vux";
 
 import { mapState } from "vuex";
-import questionJSON from "../assets/data/costPaper2021";
-// import questionJSON from "../assets/data/incorruptPaper2021";
+
+import questionJSON from "../assets/data/incorruptPaper2021";
 
 import Tips from "../components/Tips.vue";
 import util from "../lib/common";
@@ -94,7 +87,7 @@ export default {
       answerList: [],
       isCompleted: false,
       startTime: dateFormat(new Date(), "YYYY-MM-DD HH:mm:ss"),
-      raterText: ["很不满意", "不太满意", "一般", "满意", "非常满意"],
+      raterText: ["满意", "不太满意", "一般", "满意", "非常满意"],
       questionList,
     };
   },
@@ -151,14 +144,15 @@ export default {
       // });
       // return score;
     },
-    // 对公司的建议
+    // 建议
     suggest_company() {
-      return this.answerList[16] || "";
+      return this.answerList[25] || "";
     },
-    // 对部门的建议
-    suggest_dept() {
-      return this.answerList[17] || "";
-    },
+ 
+    //  suggest_dept() {
+    //   return this.answerList[25] || "";
+    // },
+
   },
   watch: {
     answerList(val) {
@@ -168,11 +162,11 @@ export default {
   methods: {
     getCompleteStatus() {
       let flag = true;
-      // 必须全部作答
+      //  最后1题不计是否答完
       for (let i = 0; flag && i < this.questionList.length; i++) {
-        // if (i == 13 || i == 28) {
-        //   break;
-        // }
+        if ( i == 25) {
+          break;
+        }
         let item = this.answerList[i];
         if (typeof item == "undefined") {
           flag = false;
@@ -197,21 +191,16 @@ export default {
         "L",
         "M",
       ];
-      //console.log("answerList", this.answerList);
+      console.log("answerList", this.answerList);
       let answer = this.answerList
         .map((item, i) => {
-          if (i < 18) {
+          if (i < 26) {
+            
             if (this.questionList[i].type === "single") {
               return arr[item];
             }
-            if (this.questionList[i].type === "multi") {
-              return item.map((item_inner) => arr[item_inner]).join("-");
-            }
-            if (this.questionList[i].type === "next") {
-              return arr[item];
-            }
-            if (this.questionList[i].type === "text") {
-              return null;
+            else if (this.questionList[i].type === "text") {
+              return item;
             }
           } else {
             return item
@@ -219,8 +208,10 @@ export default {
                 (item_inner) => arr[parseInt(item_inner.substring(0, 1)) - 1]
               )
               .join("-");
+             
           }
         })
+         
         .join(",");
       this.sport.curScore = this.score_dept + this.score_company;
       return {
@@ -229,14 +220,14 @@ export default {
         score_dept: 0,
         score_company: 0,
         suggest_company: this.suggest_company,
-        suggest_dept: this.suggest_dept,
+        suggest_dept: '',
         uid: this.sport.uid,
         answer,
       };
     },
     async submit() {
       let params = this.getSubmitData();
-      //console.log("getSubmitData", params);
+      console.log("getSubmitData", params);
       let { data } = await db.addCbpcHarmoney(params);
 
       if (data[0].id > 0) {

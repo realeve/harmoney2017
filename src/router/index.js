@@ -15,7 +15,8 @@ export default new Router({
     {
       path: "/paper",
       component: function (resolve) {
-        require(["../pages/Paper2021.vue"], resolve);
+        require(["../pages/Incorrupt.vue"], resolve);
+        // require(["../pages/Paper2021.vue"], resolve);
       },
     },
     {
