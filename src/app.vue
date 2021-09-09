@@ -74,7 +74,7 @@ export default {
       if (!val) {
         return;
       }
-      this.title = `成都印钞有限公司2021年度成本月活动正在进行中...`;
+      this.title = `“坚持对标 规范管理”专项监督工作问卷调查`;
       this.initWxShare();
     },
   },

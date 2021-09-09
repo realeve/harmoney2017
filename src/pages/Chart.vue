@@ -2,7 +2,7 @@
   <div class="wrapper">
     <div class="content">
       <p class="title margin-top-20">
-        2021年度公司成本月活动<br />2021年廉政月活动调查问卷
+        2021年廉政月活动调查问卷
       </p>
       <p class="margin-top-20 tips">
         截止至 {{ now }} ,本次活动共有{{
@@ -95,9 +95,7 @@ export default {
         //   ],
         // },
       ];
-      questionsJSON
-        // .filter((item, i) => ![16, 17].includes(i))
-         .filter((item, i) => ![25].includes(i))
+      questionsJSON.slice(0,24)
         .forEach((item, i) => {
           console.log(item, i)
           item.option = item.option || [
