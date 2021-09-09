@@ -190,7 +190,11 @@ export default {
       this.papers = await db.getCbpcHarmoney().then((res) => res.data);
       // 各部门参与情况
       this.depts = await db.getCbpcHarmoneyDept().then(({ data }) =>
-        data.map((item, i) => {
+        {data = data.filter(item=>!['中钞金服',
+'金鼎公司',
+'长城公司',
+'物业公司'].includes(item.name));
+return data.map((item, i) => {
           if (item.name.indexOf("（") > -1) {
             item.name = item.name.split("（")[0];
           }
@@ -212,7 +216,7 @@ export default {
           // }
           item.name = `${data.length - i}.${item.name}`;
           return item;
-        })
+        })}
       );
     },
   },
