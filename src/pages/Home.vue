@@ -94,7 +94,7 @@ export default {
     },
   },
   mounted() {
-    document.title = "2021年度公司成本月活动";
+    document.title = "2021年度“坚持对标 规范管理”专项监督工作问卷调查";
   },
 };
 </script>
