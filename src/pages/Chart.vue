@@ -95,9 +95,7 @@ export default {
         //   ],
         // },
       ];
-      questionsJSON
-        // .filter((item, i) => ![16, 17].includes(i))
-         .filter((item, i) => ![25].includes(i))
+      questionsJSON.slice(0,24)
         .forEach((item, i) => {
           console.log(item, i)
           item.option = item.option || [
