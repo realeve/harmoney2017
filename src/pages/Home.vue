@@ -110,6 +110,7 @@ export default {
   }
   .welcome {
     width: 80%;
+    text-align: justify;
     p {
       padding-top: 10px;
       text-indent: 2em;
