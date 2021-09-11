@@ -97,7 +97,7 @@ export default {
       ];
       questionsJSON.slice(0,24)
         .forEach((item, i) => {
-          console.log(item, i)
+          // console.log(item, i)
           item.option = item.option || [
             "很不满意",
             "不太满意",
