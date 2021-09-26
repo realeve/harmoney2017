@@ -2,7 +2,7 @@
   <div class="wrapper">
     <div class="content">
       <p class="title margin-top-20">
-        2021年廉政月活动调查问卷
+        “坚持对标 规范管理”专项监督工作<br />问卷调查
       </p>
       <p class="margin-top-20 tips">
         截止至 {{ now }} ,本次活动共有{{
@@ -95,25 +95,24 @@ export default {
         //   ],
         // },
       ];
-      questionsJSON.slice(0,24)
-        .forEach((item, i) => {
-          // console.log(item, i)
-          item.option = item.option || [
-            "很不满意",
-            "不太满意",
-            "一般",
-            "满意",
-            "非常满意",
-          ];
-          let obj = {
-            title: item.title,
-            data: item.option.map((name) => ({
-              name: name,
-              value: 0,
-            })),
-          };
-          data.push(obj);
-        });
+      questionsJSON.slice(0, 24).forEach((item, i) => {
+        // console.log(item, i)
+        item.option = item.option || [
+          "很不满意",
+          "不太满意",
+          "一般",
+          "满意",
+          "非常满意",
+        ];
+        let obj = {
+          title: item.title,
+          data: item.option.map((name) => ({
+            name: name,
+            value: 0,
+          })),
+        };
+        data.push(obj);
+      });
       let obj_next = {
         title: questionsJSON[24].title,
         data: questionsJSON[24].option.map((name) => ({
@@ -188,39 +187,41 @@ export default {
     async loadPapers() {
       this.papers = await db.getCbpcHarmoney().then((res) => res.data);
       // 各部门参与情况
-      this.depts = await db.getCbpcHarmoneyDept().then(({ data }) =>
-        {data = data.filter(item=>!['中钞金服',
-'金鼎公司',
-'长城公司',
-'物业公司'].includes(item.name));
-return data.map((item, i) => {
+      this.depts = await db.getCbpcHarmoneyDept().then(({ data }) => {
+        // data = data.filter(
+        //   (item) =>
+        //     !["中钞金服", "金鼎公司", "长城公司", "物业公司"].includes(
+        //       item.name
+        //     )
+        // );
+        return data.map((item, i) => {
           if (item.name.indexOf("（") > -1) {
             item.name = item.name.split("（")[0];
           }
-          // if (item.name.includes("公司")) {
-          //   switch (item.name) {
-          //     case "中钞金服科技有限公司":
-          //       item.name = "中钞金服";
-          //       break;
-          //     case "中钞长城贵金属有限公司":
-          //       item.name = "长城公司";
-          //       break;
-          //     case "成都金鼎安全印制有限责任公司":
-          //       item.name = "金鼎公司";
-          //       break;
-          //     case "成钞物业管理有限公司":
-          //       item.name = "物业公司";
-          //       break;
-          //   }
-          // }
+          if (item.name.includes("公司")) {
+            switch (item.name) {
+              case "中钞金服科技有限公司":
+                item.name = "中钞金服";
+                break;
+              case "中钞长城贵金属有限公司":
+                item.name = "长城公司";
+                break;
+              case "成都金鼎安全印制有限责任公司":
+                item.name = "金鼎公司";
+                break;
+              case "成钞物业管理有限公司":
+                item.name = "物业公司";
+                break;
+            }
+          }
           item.name = `${data.length - i}.${item.name}`;
           return item;
-        })}
-      );
+        });
+      });
     },
   },
   mounted() {
-    document.title = "2021年廉政月活动调查问卷";
+    document.title = "2021年度“坚持对标 规范管理”专项监督工作问卷调查";
     this.loadPapers();
   },
 };
