@@ -92,8 +92,8 @@ export default {
           trigger: "item"
         },
         grid: {
-          x: 120,
-          x2: 90
+          x: 130,
+          x2: 150
         },
         xAxis: {
           type: "value",

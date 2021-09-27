@@ -95,14 +95,13 @@ export default {
         //   ],
         // },
       ];
-      questionsJSON.slice(0, 24).forEach((item, i) => {
+      questionsJSON.slice(0, 25).forEach((item, i) => {
         // console.log(item, i)
         item.option = item.option || [
-          "很不满意",
-          "不太满意",
-          "一般",
-          "满意",
           "非常满意",
+          "比较满意",
+          "基本满意",
+          "不满意",
         ];
         let obj = {
           title: item.title,
@@ -113,14 +112,15 @@ export default {
         };
         data.push(obj);
       });
-      let obj_next = {
-        title: questionsJSON[24].title,
-        data: questionsJSON[24].option.map((name) => ({
-          name: name.substring(2),
-          value: 0,
-        })),
-      };
-      data.push(obj_next);
+      // let obj_next = {
+      //   title: questionsJSON[24].title,
+      //   data: questionsJSON[24].option.map((name) => ({
+      //     name: name.substring(2),
+      //     value: 0,
+      //   })),
+      // };
+      // data.push(obj_next);
+ 
 
       this.papers.map((item, i) => {
         // // 性别
@@ -143,7 +143,7 @@ export default {
         //   data[2].data[4].value++;
         // }
         // 其它数据
-        const answers = item.answer.split(",");
+        const answers = item.answer.split(",").slice(0,25);
         //console.log("answers", answers);
         answers.forEach((answer, idx) => {
           if (answer.length == 1) {
